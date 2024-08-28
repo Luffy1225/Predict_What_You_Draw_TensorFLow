@@ -5,7 +5,7 @@ import os
 from PIL import Image, ImageDraw
 import random
 
-from Model import MNIST_Model
+from Model import AI_Model
 
 
 class Predict_WhatUDraw_App:
@@ -79,7 +79,7 @@ class Predict_WhatUDraw_App:
         self.save_image_path = ""
 
         self.init_tkinter(root)
-        self.Model = MNIST_Model()
+        self.Model = AI_Model()
         self.save_image_path = self.Save_combobox.get()
 
         
@@ -115,7 +115,7 @@ class Predict_WhatUDraw_App:
 
     def save_image(self):
         label = self.E_Correction.get()
-        
+
         folder = os.path.join("images" , self.save_image_path)
         folder = os.path.join(folder , label)
 

@@ -9,19 +9,18 @@ import os
 # 載入訓練好的模型
 
 
-class MNIST_Model:
+class AI_Model:
 
     def __init__(self):
         self.model = self.load_model()
 
-    def load_model(self):
-        model_filename = 'mnist_model_Epoch_60.h5'  # 修改為實際模型文件名
+    def load_model(self, model_filename = "mnist_model_Epoch_60.h5"): # 修改為實際模型文件名 預設為 mnist_model_Epoch_60.h5
         model_folder = 'models'
         model_path = os.path.join(model_folder, model_filename)
 
         return load_model(model_path)
 
-    def predict_imageS(self, image_folder):
+    def predict_imageS(self, image_folder): ## Predict 多張圖片 的base function
         # 獲取資料夾中的所有檔案
         filenames = [f for f in os.listdir(image_folder) if f.endswith('.png')]
         images = []
@@ -51,7 +50,7 @@ class MNIST_Model:
 
         return predicted_label
 
-    def predict(self, image):
+    def predict(self, image): # Predict 單張圖片 的base function
         # img = PIL Image 
         img = self._load_and_preprocess_image(image) 
 
@@ -81,11 +80,21 @@ class MNIST_Model:
     def SwitchModel(self, model_path):
         self.model = load_model(model_path)
 
+    def Show_Effencicy():
+        #用 matplotlib 顯示 效果
+        pass
 
+
+    def EvaluatePerformance( use_self_test_data : bool = False):
+        test_loss, test_acc = model.evaluate(test_images, test_labels)
+
+
+class MNIST_Model:
+    pass
 
 
 if __name__ == '__main__':
-    model = MNIST_Model()
+    model = AI_Model()
     print(model.predict_image_path("image\\drawing_1862148976.png"))
 
 
