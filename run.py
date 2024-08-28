@@ -35,6 +35,7 @@ class Predict_WhatUDraw_App:
         models_list = self._get_Models_list()
 
         self.Model_combobox = ttk.Combobox(root, values=models_list)
+        self.Model_combobox.config(width=30)
         self.Model_combobox.pack(pady=10)
         self.Model_combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
         self.Model_combobox.current(0)
@@ -42,12 +43,12 @@ class Predict_WhatUDraw_App:
         self.Test_button = tk.Button(self.root, text="開始預測", command=self.Predict)
         self.Test_button.pack(side=tk.LEFT)
 
-        self.Clear_button = tk.Button(self.root, text="清除畫板", command=self.Predict)
+        self.Clear_button = tk.Button(self.root, text="清除畫板", command=self.Clear)
         self.Clear_button.pack(side=tk.LEFT)
 
 
 
-        self.lb_Predict = tk.Label(root, text="預測: ")
+        self.lb_Predict = tk.Label(root, text="預測: ", font=("Helvetica", 16))
         self.lb_Predict.pack(pady=20, fill='x')
 
 
@@ -113,6 +114,20 @@ class Predict_WhatUDraw_App:
         self.lb_Predict.config(text=f"預測: {pred_label}")  # 修改 Label 的文字
         self.lb_Predict.pack(pady=20)  # 使用 pack() 方法顯示在視窗中
 
+    def Clear(self):
+        # 清空 Canvas 上的內容
+        self.canvas.delete("all")
+        
+        # 重新建立一個黑色背景的圖片
+        self.image = Image.new('RGB', (28, 28), 'black')
+        self.draw = ImageDraw.Draw(self.image)
+
+        # 更新 Canvas 上的 PhotoImage
+        self.canvas_image = tk.PhotoImage(width=self.canvas_size, height=self.canvas_size)
+        self.canvas.create_image((self.canvas_size//2, self.canvas_size//2), image=self.canvas_image, anchor=tk.CENTER)
+        self.canvas.update_idletasks()
+    
+    
     def on_combobox_select(self, event):
         # 獲取選擇的模型
         selected_model_text = self.Model_combobox.get()
