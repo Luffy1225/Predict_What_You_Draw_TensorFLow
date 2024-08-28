@@ -21,7 +21,7 @@ class MNIST_Model:
 
         return load_model(model_path)
 
-    def predict_images(self, image_folder):
+    def predict_imageS(self, image_folder):
         # 獲取資料夾中的所有檔案
         filenames = [f for f in os.listdir(image_folder) if f.endswith('.png')]
         images = []
@@ -43,18 +43,16 @@ class MNIST_Model:
         predicted_labels = np.argmax(predictions, axis=1)
         
         return valid_filenames, images, predicted_labels
+    
+    def predict_image_path(self, image_path):
+        img = Image.open(image_path)
 
-    def predict_result(self, filename_path):
-        # 圖片前處理
-        img = self._load_and_preprocess_imagePath(filename_path) 
-
-        img = np.expand_dims(img, axis=0)  # 增加一維以匹配模型輸入
-        prediction = self.model.predict(img)
-        predicted_label = np.argmax(prediction, axis=1)
+        predicted_label = self.predict(img)
 
         return predicted_label
 
     def predict(self, image):
+        # img = PIL Image 
         img = self._load_and_preprocess_image(image) 
 
         img = np.expand_dims(img, axis=0)  # 增加一維以匹配模型輸入
@@ -63,22 +61,6 @@ class MNIST_Model:
 
         predicted_label = predicted_label[0]
         return predicted_label
-
-    # 載入圖片並進行預處理
-    def _load_and_preprocess_imagePath(self, img_path):
-        if not os.path.exists(img_path):
-            print(f"圖片不存在: {img_path}")
-            return None
-        
-        img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # 讀取為灰度圖
-        if img is None:
-            print(f"無法讀取圖片: {img_path}")
-            return None
-    
-        img = cv2.resize(img, (28, 28))  # 調整大小為 28x28
-        img = img.astype('float32') / 255  # 正規化
-        img = np.expand_dims(img, axis=-1)  # 增加一維以匹配模型輸入
-        return img
 
     def _load_and_preprocess_image(self, img):
         if isinstance(img, Image.Image):
@@ -100,5 +82,10 @@ class MNIST_Model:
         self.model = load_model(model_path)
 
 
-model = MNIST_Model()
-print(model.predict_result("image\\drawing_1862148976.png"))
+
+
+if __name__ == '__main__':
+    model = MNIST_Model()
+    print(model.predict_image_path("image\\drawing_1862148976.png"))
+
+

@@ -17,8 +17,9 @@ class Predict_WhatUDraw_App:
         self.canvas_size = 280  # 放大顯示區域的尺寸
         self.pixel_size = 10    # 每個像素的顯示大小
         
+        # 初始化畫布
         self.canvas = tk.Canvas(self.root, width=self.canvas_size, height=self.canvas_size, bg='black')
-        self.canvas.pack()
+        self.canvas.grid(row=0, column=0, columnspan=4)  # 將畫布放在第一行，橫跨4列
         
         self.canvas.bind("<B1-Motion>", self.paint)
         
@@ -27,36 +28,63 @@ class Predict_WhatUDraw_App:
         
         self.canvas_image = tk.PhotoImage(width=self.canvas_size, height=self.canvas_size)
         self.canvas.create_image((self.canvas_size//2, self.canvas_size//2), image=self.canvas_image, anchor=tk.CENTER)
-
-        # self.save_button = tk.Button(self.root, text="Save", command=self.save_image)
-        # self.save_button.pack()
-
-
+        
+        # 模型選擇下拉框
         models_list = self._get_Models_list()
-
-        self.Model_combobox = ttk.Combobox(root, values=models_list)
+        self.Model_combobox = ttk.Combobox(root, values=models_list,font=("Helvetica", 16))
         self.Model_combobox.config(width=30)
-        self.Model_combobox.pack(pady=10)
-        self.Model_combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
+        self.Model_combobox.grid(row=1, column=0, columnspan=2,padx=30, pady=10)
+        self.Model_combobox.bind("<<ComboboxSelected>>", self.Model_combobox_on_combobox_select)
         self.Model_combobox.current(0)
 
-        self.Test_button = tk.Button(self.root, text="開始預測", command=self.Predict)
-        self.Test_button.pack(side=tk.LEFT)
+        # 開始預測按鈕
+        self.Predict_button = tk.Button(self.root, text="開始預測", command=self.Predict,font=("Helvetica", 16))
+        self.Predict_button.grid(row=2, column=0, padx=10)
 
-        self.Clear_button = tk.Button(self.root, text="清除畫板", command=self.Clear)
-        self.Clear_button.pack(side=tk.LEFT)
+        # 清除畫板按鈕
+        self.Clear_button = tk.Button(self.root, text="清除畫板", command=self.Clear,font=("Helvetica", 16))
+        self.Clear_button.grid(row=2, column=1, padx=10)
 
+        # 預測結果無用標籤
+        self.lb_label1 = tk.Label(root, text="預測: ", font=("Helvetica", 16))
+        self.lb_label1.grid(row=3, column=0, columnspan=4, padx=30,pady=10, sticky='w')
 
+        # 預測結果標籤
+        self.lb_Predict = tk.Label(root, text="未開始", font=("Helvetica", 16))
+        self.lb_Predict.config(width=20)
+        self.lb_Predict.grid(row=3, column=1, columnspan=4, pady=5, sticky='w')
 
-        self.lb_Predict = tk.Label(root, text="預測: ", font=("Helvetica", 16))
-        self.lb_Predict.pack(pady=20, fill='x')
+        # 訂正輸入標籤
+        self.lb_Correction = tk.Label(root, text="修正: ", font=("Helvetica", 16))
+        self.lb_Correction.grid(row=4, column=0, columnspan=4, padx=30,pady=10, sticky='w')
+        # 訂正輸入框
+        self.E_Correction = tk.Entry(root,font=("Helvetica", 16))
+        self.E_Correction.config(width=20)
+        self.E_Correction.grid(row=4, column=1, columnspan=4, pady=5, sticky='w')
 
+        # 保存圖片按鈕
+        self.Save_button = tk.Button(self.root, text="保存圖片", command=self.save_image ,font=("Helvetica", 16))
+        self.Save_button.grid(row=5, column=0, padx=5)
+
+        # 保存選擇下拉框
+        self.Save_combobox = ttk.Combobox(root, values=["train", "test"],font=("Helvetica", 16))
+        self.Save_combobox.config(width=10)
+        self.Save_combobox.grid(row=5, column=1, pady=10)
+        self.Save_combobox.bind("<<ComboboxSelected>>", self.Save_combobox_on_combobox_select)
+        self.Save_combobox.current(0)
 
         
 
     def __init__(self, root):
+        self.save_image_path = ""
+
         self.init_tkinter(root)
         self.Model = MNIST_Model()
+        self.save_image_path = self.Save_combobox.get()
+
+        
+        
+
 
 
     def paint(self, event):
@@ -86,9 +114,14 @@ class Predict_WhatUDraw_App:
         return random_code
 
     def save_image(self):
-        folder = "image"
+        label = self.E_Correction.get()
+        
+        folder = os.path.join("images" , self.save_image_path)
+        folder = os.path.join(folder , label)
+
         randomcode = self.generate_random_code()
-        filename = "drawing_" + randomcode + ".png"
+        
+        filename = "Image_"+  label + "_" + randomcode + ".png"
         Image_path = os.path.join(folder, filename)
 
         # 儲存圖片
@@ -110,9 +143,13 @@ class Predict_WhatUDraw_App:
 
         pred_label = self.Model.predict(self.image)
 
+        text = f"{pred_label}"
         print(f"預測: {pred_label}")
         self.lb_Predict.config(text=f"預測: {pred_label}")  # 修改 Label 的文字
-        self.lb_Predict.pack(pady=20)  # 使用 pack() 方法顯示在視窗中
+
+        self.E_Correction.delete(0, tk.END)  # 清除輸入框中的內容
+        self.E_Correction.insert(0, text)  # 插入新的文字
+
 
     def Clear(self):
         # 清空 Canvas 上的內容
@@ -128,7 +165,14 @@ class Predict_WhatUDraw_App:
         self.canvas.update_idletasks()
     
     
-    def on_combobox_select(self, event):
+    def Save_combobox_on_combobox_select(self, event):
+        
+        self.save_image_path = self.Save_combobox.get()
+
+        print(f"圖片 將保存於 : {self.save_image_path} 資料夾")
+
+
+    def Model_combobox_on_combobox_select(self, event):
         # 獲取選擇的模型
         selected_model_text = self.Model_combobox.get()
 
@@ -138,6 +182,7 @@ class Predict_WhatUDraw_App:
         self.Model.SwitchModel(selected_model_path)
 
         print(f"選擇的模型是: {selected_model_path}")
+
 
 
     def _get_Models_list(self):
