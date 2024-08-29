@@ -104,10 +104,12 @@ class FolderManager:
 if __name__ == "__main__":
 
     while(True):
-        print("輸入 查詢的資料夾.\n輸入 -1 退出(預設位置為: images)")
+        print("輸入 查詢的圖片資料夾.\n輸入 -1 退出(預設位置為: images)")
         Manage_Path = input("資料夾地址: ")
 
         if(Manage_Path == "-1"):
             break
+
+
         manager = FolderManager(Manage_Path)
-        manager.Count_File()  # 輸入您需要的副檔名
+        manager.Count_File(PICTURE_EXT_LIST)  # 輸入您需要的副檔名

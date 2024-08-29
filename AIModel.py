@@ -1,25 +1,13 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 from PIL import Image
-from tensorflow.keras.models import load_model # type: ignore
 import cv2
-import os
-
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
 from tensorflow.keras.datasets import mnist # type: ignore
 from tensorflow.keras.utils import to_categorical # type: ignore
-from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.models import Sequential, load_model # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type: ignore
-
-# from Create_train_data import load_train_data
-
-
-
-# 載入訓練好的模型
 
 
 class AI_Model:
@@ -348,8 +336,6 @@ class AI_Model:
         return valid
 
     #endregion
-
-
 
 
 
