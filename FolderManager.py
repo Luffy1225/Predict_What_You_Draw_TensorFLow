@@ -1,5 +1,5 @@
 import os
-
+import string
 
 PICTURE_EXT_LIST = ['.jpg', '.png']
 PYTHON_EXT_LIST = ['py']
@@ -99,17 +99,42 @@ class FolderManager:
         else:
             return "沒有附檔名限制"
 
+    @staticmethod
+    def Build_Train_Folders():
+        base_folder = "images"
+        subfolders = ["ignore", "train", "test"]
 
+        # 數字和字母資料夾名稱
+        digits = [str(i) for i in range(10)]
+        letters = list(string.ascii_uppercase)
+
+        # 創建主資料夾
+        os.makedirs(base_folder, exist_ok=True)
+
+        # 在每個子資料夾中創建數字和字母資料夾
+        for subfolder in subfolders:
+            subfolder_path = os.path.join(base_folder, subfolder)
+            os.makedirs(subfolder_path, exist_ok=True)
+            
+            for digit in digits:
+                os.makedirs(os.path.join(subfolder_path, digit), exist_ok=True)
+            
+            for letter in letters:
+                os.makedirs(os.path.join(subfolder_path, letter), exist_ok=True)
+
+        print("資料夾結構已建立完畢。")
 
 if __name__ == "__main__":
 
-    while(True):
-        print("輸入 查詢的圖片資料夾.\n輸入 -1 退出(預設位置為: images)")
-        Manage_Path = input("資料夾地址: ")
+    FolderManager.Build_Train_Folders()
+    
+    # while(True):
+    #     print("輸入 查詢的圖片資料夾.\n輸入 -1 退出(預設位置為: images)")
+    #     Manage_Path = input("資料夾地址: ")
 
-        if(Manage_Path == "-1"):
-            break
+    #     if(Manage_Path == "-1"):
+    #         break
 
 
-        manager = FolderManager(Manage_Path)
-        manager.Count_File(PICTURE_EXT_LIST)  # 輸入您需要的副檔名
+    #     manager = FolderManager(Manage_Path)
+    #     manager.Count_File(PICTURE_EXT_LIST)  # 輸入您需要的副檔名
