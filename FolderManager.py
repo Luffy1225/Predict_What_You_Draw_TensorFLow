@@ -9,8 +9,14 @@ PYTHON_EXT_LIST = ['py']
 
 
 class FolderManager:
-    def __init__(self, imagefolder="images", valid_ext = None):
-        self.Imagefolder = imagefolder
+    def __init__(self, imagefolder, valid_ext = None):
+        self.Default_Imagefolder = "images"
+
+        if(imagefolder == ""):
+            self.Imagefolder = self.Default_Imagefolder
+        else:
+            self.Imagefolder = imagefolder
+       
         self.Valid_ext = valid_ext
 
     def Count_File(self, valid_ext=None):
@@ -96,5 +102,12 @@ class FolderManager:
 
 
 if __name__ == "__main__":
-    manager = FolderManager("images")
-    manager.Count_File()  # 輸入您需要的副檔名
+
+    while(True):
+        print("輸入 查詢的資料夾.\n輸入 -1 退出(預設位置為: images)")
+        Manage_Path = input("資料夾地址: ")
+
+        if(Manage_Path == "-1"):
+            break
+        manager = FolderManager(Manage_Path)
+        manager.Count_File()  # 輸入您需要的副檔名
