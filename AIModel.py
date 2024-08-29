@@ -8,6 +8,8 @@ from tensorflow.keras.datasets import mnist # type: ignore
 from tensorflow.keras.utils import to_categorical # type: ignore
 from tensorflow.keras.models import Sequential, load_model # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type: ignore
+import subprocess
+
 
 
 class AI_Model:
@@ -269,16 +271,25 @@ class AI_Model:
         if(self.History is not None):   
 
             # 新增字體
-            font_name = 'taipei_sans_tc_beta.ttf'
-            # 將 font-family 設為 Taipei Sans TC Beta
-            font_path = os.path.join("font",font_name)
-            if( not os.path.exists(font_path)):
-                print(f"找不到 font {font_path}")
-                print(f"如要使用font 請輸入:")
-                print('wget -O taipei_sans_tc_beta.ttf "https://drive.google.com/uc?id=1eGAsTN1HBpJAkeVM57_C7ccp7hbgSz3_&export=download"')
+            _font_name = 'taipei_sans_tc_beta.ttf'
+            font_path = os.path.join("font",_font_name)
+
+            passflag = self._check_and_download_font(font_path) # 檢查 font 存不存在, 不存在不能執行
+
+            if(not passflag):
                 return
+
+            # if( not os.path.exists(font_path)):
+
+            #     print(f"找不到 font {font_path}")
+            #     print(f"如要使用font 請輸入:")
+            #     print('wget -O taipei_sans_tc_beta.ttf "https://drive.google.com/uc?id=1eGAsTN1HBpJAkeVM57_C7ccp7hbgSz3_&export=download"')
+
+            #     print("嘗試自動下載...")
+            #     self._download_font()
+            #     return
             
-            matplotlib.font_manager.fontManager.addfont(font_name)
+            matplotlib.font_manager.fontManager.addfont(font_path)
             matplotlib.rc('font', family='Taipei Sans TC Beta')
 
 
@@ -334,6 +345,45 @@ class AI_Model:
             print(f"未找到 Model: {model_name}")
 
         return valid
+    
+
+    def _download_font(self): # 不要使用 (請使用_check_and_download_font)
+        # 確保 font 資料夾存在
+        os.makedirs('font', exist_ok=True)
+
+        # 下載字型檔案
+        url = "https://drive.google.com/uc?id=1eGAsTN1HBpJAkeVM57_C7ccp7hbgSz3_&export=download"
+        output_file = 'font/taipei_sans_tc_beta.ttf'
+
+        # 使用 wget 下載檔案
+        try:
+            subprocess.run(['wget', '-O', output_file, url], check=True)
+            print(f'File downloaded successfully and saved to {output_file}')
+        except subprocess.CalledProcessError as e:
+            print(f'Error occurred while downloading the file: {e}')
+
+    def _check_and_download_font(self, check_font_path):
+        passflag = False
+
+        if not os.path.exists(check_font_path):
+            print(f"找不到 font {check_font_path}")
+            print("嘗試自動下載...")
+
+            # 嘗試下載字型檔案
+            self._download_font()
+            
+            # 再次檢查字型檔案是否存在
+            if not os.path.exists(check_font_path):
+                print(f"字型檔案仍然不存在: {check_font_path}")
+                print("請手動下載字型檔案並將其放置在 'font' 資料夾中。")
+            else:
+                print(f"字型檔案下載成功: {check_font_path}")
+                passflag = True
+        else:
+            print(f"字型檔案已存在: {check_font_path}")
+            passflag = True
+
+        return passflag
 
     #endregion
 
@@ -356,6 +406,7 @@ if __name__ == '__main__':
 
 
         if(input_str == "1"):
+            Model = AI_Model()
             print("\n\n已建立新Model\n\n")
         elif(input_str == "2"):
             Model.Print_Model_List()

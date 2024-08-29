@@ -119,8 +119,6 @@ class Predict_WhatUDraw_App:
         self.canvas.create_image((self.canvas_size//2, self.canvas_size//2), image=self.canvas_image, anchor=tk.CENTER)
         self.canvas.update_idletasks()
 
-
-
     def Predict(self):
 
         pred_label = self.Model.Predict(self.image)
