@@ -7,7 +7,7 @@ from tensorflow.keras.utils import to_categorical # type: ignore
 from tensorflow.keras.models import Sequential # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type: ignore
 
-from Create_train_data import load_train_data
+from old.Create_train_data_2024_08_28 import load_train_data
 
 
 # 載入數據
