@@ -134,7 +134,10 @@ class Predict_WhatUDraw_App:
 
         pred_label = self.Model.Predict(self.image)
 
-        text = f"{pred_label}"
+        # text = f"{pred_label}"
+        text= self._label_to_str(pred_label)
+
+        pred_label = text
         print(f"預測: {pred_label}")
         self.lb_Predict.config(text=f"預測: {pred_label}")  # 修改 Label 的文字
 
@@ -193,7 +196,14 @@ class Predict_WhatUDraw_App:
     def _paint_reset(self, event):
         self.prevPoint = [0, 0]
 
-
+    def _label_to_str(self, label):
+        if 0 <= label <= 9:
+            return str(label)  # 0 到 9 直接轉換為字符串
+        elif 10 <= label <= 35:
+            # 將 10-35 轉換為 'A'-'Z'
+            return chr(label - 10 + ord('A'))
+        else:
+            raise ValueError("Label must be between 0 and 35")
 
 
     def _generate_random_code(self, length=15):
