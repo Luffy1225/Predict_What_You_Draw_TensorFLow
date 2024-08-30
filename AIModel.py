@@ -171,7 +171,7 @@ class AI_Model:
             
             # 保存模型
             model_name = self.Model_Name # 模型名稱
-            model_full_name = f'{model_name}_Epoch_{ self._Epoch}.h5'
+            model_full_name = f'{model_name}_Epoch_{ self._Epochs}.h5'
             model_full_name = os.path.join(models_path, model_full_name)
 
             print(f"Model {model_name}保存到: {model_full_name}")
