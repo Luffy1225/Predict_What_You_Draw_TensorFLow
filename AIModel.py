@@ -176,8 +176,9 @@ class AI_Model:
             models_path = "models"  # 保存路徑資料夾
             
             # 保存模型
-            model_name = self.Model_Name # 模型名稱
-            model_full_name = f'{model_name}_Epoch_{ self._Epochs}.h5'
+            # model_name = self.Model_Name # 模型名稱
+            model_name = Model_name # 模型名稱
+            model_full_name = f'{model_name}_Epoch_{ self._Epochs}.keras'
             model_full_name = os.path.join(models_path, model_full_name)
 
             print(f"Model {model_name}保存到: {model_full_name}")
@@ -426,7 +427,7 @@ if __name__ == '__main__':
             Model.EvaluatePerformance()
         elif(input_str == "5"):
             save_model_name = input("輸入 新Model名稱: ")
-            Model.Save_Model()
+            Model.Save_Model(save_model_name)
         else:
             break
 
