@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 
+import string
+
 import os
 from PIL import Image, ImageDraw, ImageTk
 import random
@@ -191,16 +193,12 @@ class Predict_WhatUDraw_App:
 
 
 
-    def _generate_random_code(self, length=10):
-        # 建立一個空的字串來儲存隨機碼
-        random_code = ''
+    def _generate_random_code(self, length=15):
+        # 定義可用於隨機碼的字元集，包括數字和字母
+        characters = string.ascii_letters + string.digits
         
-        # 依照指定長度生成隨機數字
-        for _ in range(length):
-            # 產生一個介於0到9之間的隨機數字
-            digit = random.randint(0, 9)
-            # 將數字轉成字串並添加到隨機碼中
-            random_code += str(digit)
+        # 使用隨機選擇來生成隨機碼
+        random_code = ''.join(random.choice(characters) for _ in range(length))
         
         return random_code
 

@@ -125,6 +125,13 @@ class FolderManager:
 
         print(f"{base_folder} 資料夾結構已建立完畢。")
 
+    @staticmethod
+    def Import_image_to_image(frompath, to_path):
+        pass
+
+
+
+
 if __name__ == "__main__":
 
     # FolderManager.Build_Train_Folders()
