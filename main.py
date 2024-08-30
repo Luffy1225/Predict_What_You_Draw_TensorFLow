@@ -196,6 +196,7 @@ class Predict_WhatUDraw_App:
     def _paint_reset(self, event):
         self.prevPoint = [0, 0]
 
+
     def _label_to_str(self, label):
         if 0 <= label <= 9:
             return str(label)  # 0 到 9 直接轉換為字符串
