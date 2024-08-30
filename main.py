@@ -23,8 +23,6 @@ class Predict_WhatUDraw_App:
         
         self.QuickSave = True
 
-
-
         #variable for pencil
         self.prevPoint = [0,0]
         self.currentPoint = [0,0]

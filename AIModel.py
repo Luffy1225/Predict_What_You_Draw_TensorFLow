@@ -21,6 +21,8 @@ class AI_Model:
 
         self.History = None  # 保存模型訓練過程中各種參數和結果
 
+        self.Train_SelfDataset_or_not = True  # 預設使用 自己 訓練集 訓練
+
         self._train_flag = False
         self._Epochs = -1
 
@@ -96,19 +98,19 @@ class AI_Model:
     def SwitchModel(self, model_path):
         self.Model = load_model(model_path)
 
-    def EvaluatePerformance(self, use_self_test_data : bool = False):
+    def EvaluatePerformance(self):
         if self.Model is None:
             print("模型尚未載入，請先載入模型")
             return
         
-        (train_images, train_labels), (test_images, test_labels) = self._load_train_data()
+        (train_images, train_labels), (test_images, test_labels) = self._load_train_data(self.Train_SelfDataset_or_not)
 
         # 數據預處理
-        # train_images = train_images.astype('float32') / 255
+        train_images = train_images.astype('float32') / 255
         test_images = test_images.astype('float32') / 255
-        # train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
+        train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
         test_images = test_images.reshape((test_images.shape[0], 28, 28, 1))
-        # train_labels = to_categorical(train_labels)
+        train_labels = to_categorical(train_labels)
         test_labels = to_categorical(test_labels)
 
         test_loss, test_acc = self.Model.evaluate(test_images, test_labels)
@@ -120,8 +122,9 @@ class AI_Model:
         else:
             print("模型尚未訓練，無法顯示訓練過程。")
 
-    def Train_Model(self, Save_Model = False , epochs = 5, use_sel_train_data : bool = False): # 訓練模型的base function
-        (train_images, train_labels), (test_images, test_labels) = self._load_train_data(use_sel_train_data)  # 預計接口
+    def Train_Model(self, Save_Model = False , epochs = 5): # 訓練模型的base function
+        
+        (train_images, train_labels), (test_images, test_labels) = self._load_train_data(self.Train_SelfDataset_or_not)  # 預計接口
 
         # 數據預處理
         train_images = train_images.astype('float32') / 255
@@ -132,7 +135,10 @@ class AI_Model:
         test_labels = to_categorical(test_labels)
 
 
-        label_amount = len(train_labels[0])
+        train_label_amount = len(train_labels[0])
+        print(f"Train 有{train_label_amount}個label")
+        test_label_amount = len(test_labels[0])
+        print(f"Test 有{test_label_amount}個label")
 
 
         # 假設這是你的模型定義和訓練代碼
@@ -143,7 +149,7 @@ class AI_Model:
             MaxPooling2D((2, 2)),
             Flatten(),
             Dense(64, activation='relu'),
-            Dense(label_amount, activation='softmax')
+            Dense(train_label_amount, activation='softmax')
         ])
 
         model.compile(optimizer='adam',
@@ -256,6 +262,7 @@ class AI_Model:
                         
                         # 將標籤（類別索引）添加到標籤列表中
                         label_list.append(class_label)
+                    
 
         print(f"{train_folder} 裡面有 {len(image_list)} 張圖像")
 
@@ -409,13 +416,12 @@ if __name__ == '__main__':
             Model.Load_model(select_model)
         elif(input_str == "3"):
             mnistOrNOtstr = input("要不要用 MNIST訓練集, 不要 : 使用自己的images訓練集 (y/n)")
-
-            flag = False
-            if(mnistOrNOtstr == "y"): flag = False
-            else: flag = True
+            
+            if(mnistOrNOtstr == "y"): Model.Train_SelfDataset_or_not = False
+            else: Model.Train_SelfDataset_or_not = True
 
             in_epoch = int(input("輸入訓練週期(Epochs): "))
-            Model.Train_Model(epochs = in_epoch, use_sel_train_data=flag)
+            Model.Train_Model(epochs = in_epoch)
         elif(input_str == "4"):
             Model.EvaluatePerformance()
         elif(input_str == "5"):
