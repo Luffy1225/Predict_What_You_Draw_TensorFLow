@@ -17,7 +17,8 @@ class AI_Model:
     def __init__(self, default_model_name = "mnist_model_Epoch_60.h5"):
         self.default_model_name = default_model_name
         self.Model_Name = ""
-        self.Model = self.Load_model(default_model_name)
+        # self.Model = self.Load_model(default_model_name)
+        self.Model = None
 
         self.History = None  # 保存模型訓練過程中各種參數和結果
 
@@ -228,7 +229,7 @@ class AI_Model:
 
         return (image, label)
 
-    def _image_and_label(train_folder): # 取得 images 和 label 的 base function
+    def _image_and_label(self,train_folder): # 取得 images 和 label 的 base function
         # 指定訓練圖像資料夾的路徑
 
         # 創建一個空列表來儲存所有的圖像陣列和標籤
@@ -408,8 +409,14 @@ if __name__ == '__main__':
             select_model = input("請輸入要載入的Model : ")
             Model.Load_model(select_model)
         elif(input_str == "3"):
+            mnistOrNOtstr = input("要不要用 MNIST訓練集, 不要 : 使用自己的images訓練集 (y/n)")
+
+            flag = False
+            if(mnistOrNOtstr == "y"): flag = False
+            else: flag = True
+
             in_epoch = int(input("輸入訓練週期(Epochs): "))
-            Model.Train_Model(epochs = in_epoch)
+            Model.Train_Model(epochs = in_epoch, use_sel_train_data=flag)
         elif(input_str == "4"):
             Model.EvaluatePerformance()
         elif(input_str == "5"):

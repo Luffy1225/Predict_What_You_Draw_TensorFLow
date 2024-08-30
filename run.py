@@ -16,13 +16,8 @@ class Predict_WhatUDraw_App:
         self.root = root
         self.root.title("Drawing App")
         
-
-
-        self.canvas_size = 280
-        self.image_size = 28
-
-
         self.canvas_size = 280  # 放大顯示區域的尺寸
+        self.image_size = 28
         # self.pixel_size = 10    # 每個像素的顯示大小
         
         #variable for pencil
