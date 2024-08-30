@@ -1,5 +1,7 @@
 import os
 import string
+import shutil
+
 
 PICTURE_EXT_LIST = ['.jpg', '.png']
 PYTHON_EXT_LIST = ['py']
@@ -127,7 +129,59 @@ class FolderManager:
 
     @staticmethod
     def Import_image_to_image(frompath, to_path):
-        pass
+        try:
+            # 確認來源資料夾是否存在
+            if not os.path.isdir(frompath):
+                print(f"來源資料夾 {frompath} 不存在。")
+                return
+
+            # 檢查目標資料夾是否為空字符串
+            if not to_path:
+                print("目標資料夾名稱不能是空字符串。")
+                return
+
+            # 生成目標資料夾名稱
+            target_folder = to_path + '_TARGET'
+
+            # 如果目標資料夾不存在，創建與來源資料夾相同的結構
+            if not os.path.isdir(target_folder):
+                print(f"目標資料夾 {target_folder} 不存在，正在創建...")
+                shutil.copytree(frompath, target_folder, dirs_exist_ok=True)
+                print(f"資料夾結構 {target_folder} 已建立完成。")
+            else:
+                # 如果目標資料夾存在，先備份
+                backup_path = target_folder + '_BACKUP'
+                if not os.path.isdir(backup_path):
+                    shutil.copytree(target_folder, backup_path)
+                    print(f"備份資料夾 {target_folder} 到 {backup_path} 完成。")
+                else:
+                    print(f"備份資料夾 {backup_path} 已存在，請手動處理。")
+
+            # 將來源資料夾中的檔案複製到目標資料夾中
+            for root, dirs, files in os.walk(frompath):
+                for file in files:
+                    src_file = os.path.join(root, file)
+                    # 生成相對路徑，以保持資料夾結構
+                    rel_path = os.path.relpath(src_file, frompath)
+                    dest_file = os.path.join(target_folder, rel_path)
+                    dest_folder = os.path.dirname(dest_file)
+
+                    # 創建目標資料夾（如果不存在）
+                    os.makedirs(dest_folder, exist_ok=True)
+
+                    # 檢查目標檔案是否已存在
+                    if os.path.isfile(dest_file):
+                        print(f"{file} 已存在於 {dest_folder}。")
+                    else:
+                        shutil.copy2(src_file, dest_file)
+                        print(f"檔案 {file} 從 {src_file} 複製到 {dest_file} 完成。")
+
+        except Exception as e:
+            print(f"導入圖像時發生錯誤: {e}")
+
+
+
+
 
 
 
@@ -136,13 +190,14 @@ if __name__ == "__main__":
 
     # FolderManager.Build_Train_Folders()
     
-    while(True):
-        print(f"輸入 查詢的圖片資料夾.\n輸入 -1 退出(預設位置為: {FolderManager.Default_Imagefolder})")
-        Manage_Path = input("資料夾地址: ")
+    # while(True):
+    #     print(f"輸入 查詢的圖片資料夾.\n輸入 -1 退出(預設位置為: {FolderManager.Default_Imagefolder})")
+    #     Manage_Path = input("資料夾地址: ")
 
-        if(Manage_Path == "-1"):
-            break
+    #     if(Manage_Path == "-1"):
+    #         break
 
 
-        manager = FolderManager(Manage_Path)
-        manager.Count_File(PICTURE_EXT_LIST)  # 輸入您需要的副檔名
+    #     manager = FolderManager(Manage_Path)
+    #     manager.Count_File(PICTURE_EXT_LIST)  # 輸入您需要的副檔名
+    FolderManager.Import_image_to_image("images", "New_Images")
