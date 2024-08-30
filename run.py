@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 import os
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageTk
 import random
 
 from AIModel import AI_Model
@@ -14,8 +14,14 @@ class Predict_WhatUDraw_App:
         self.root = root
         self.root.title("Drawing App")
         
+
+
+        self.canvas_size = 280
+        self.image_size = 28
+
+
         self.canvas_size = 280  # 放大顯示區域的尺寸
-        self.pixel_size = 10    # 每個像素的顯示大小
+        # self.pixel_size = 10    # 每個像素的顯示大小
         
         #variable for pencil
         self.prevPoint = [0,0]
@@ -27,7 +33,7 @@ class Predict_WhatUDraw_App:
         self.canvas.grid(row=0, column=0, columnspan=4)  # 將畫布放在第一行，橫跨4列
         
         self.canvas.bind("<B1-Motion>", self._paint)
-        self.canvas.bind("<ButtonRelease-1>", self._paint)
+        self.canvas.bind("<ButtonRelease-1>", self._paint_reset)
         
         self.image = Image.new('RGB', (28, 28), 'black')
         self.draw = ImageDraw.Draw(self.image)
@@ -150,19 +156,25 @@ class Predict_WhatUDraw_App:
 
     # 畫畫function
     def _paint(self, event):
-
-        #reference :https://www.youtube.com/watch?v=QhlNI_puvCk&list=PLeb12iNltItFypA6pRWNsgb2y_wtCxZKL&index=6
-
         x = event.x
         y = event.y
-        self.currentPoint = [x,y]
+        self.currentPoint = [x // (self.canvas_size // self.image_size), y // (self.canvas_size // self.image_size)]
 
-        if(self.prevPoint != [0,0]):
+
+
+        if self.prevPoint != [0, 0]:
+            # 繪製到tkinter畫布上
             self.canvas.create_line(
-                self.prevPoint[0], self.prevPoint[1],
-                self.currentPoint[0],self.currentPoint[1],
-                fill="white", width= 10,
+                self.prevPoint[0] * (self.canvas_size // self.image_size), self.prevPoint[1] * (self.canvas_size // self.image_size),
+                self.currentPoint[0] * (self.canvas_size // self.image_size), self.currentPoint[1] * (self.canvas_size // self.image_size),
+                fill="white", width=10,
                 capstyle=tk.ROUND
+            )
+
+            # 繪製到PIL圖像上
+            self.draw.line(
+                [self.prevPoint[0], self.prevPoint[1], self.currentPoint[0], self.currentPoint[1]],
+                fill="white", width=1  # 使用較小的寬度
             )
 
 
@@ -170,6 +182,14 @@ class Predict_WhatUDraw_App:
 
         if(event.type == "5"): # 鬆開
             self.prevPoint = [0,0]
+        
+        self.prevPoint = self.currentPoint
+
+    def _paint_reset(self, event):
+        self.prevPoint = [0, 0]
+
+
+
 
     def _generate_random_code(self, length=10):
         # 建立一個空的字串來儲存隨機碼
