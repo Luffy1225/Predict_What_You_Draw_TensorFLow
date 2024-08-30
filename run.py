@@ -4,7 +4,7 @@ from tkinter import ttk
 import string
 
 import os
-from PIL import Image, ImageDraw, ImageTk
+from PIL import Image, ImageDraw
 import random
 
 from AIModel import AI_Model

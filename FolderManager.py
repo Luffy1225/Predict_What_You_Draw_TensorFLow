@@ -2,12 +2,8 @@ import os
 import string
 import shutil
 
-
 PICTURE_EXT_LIST = ['.jpg', '.png']
 PYTHON_EXT_LIST = ['py']
-
-
-
 
 
 class FolderManager:
@@ -23,7 +19,7 @@ class FolderManager:
         self.Valid_ext = valid_ext
 
 
-    def Count_File(self ,valid_ext=None):
+    def Count_File(self ,valid_ext=None, TargetCount = 216000):
         if valid_ext is None:
             valid_ext = self.Valid_ext
 
@@ -65,6 +61,18 @@ class FolderManager:
             total_size += subfolder_size
 
         print(f"{self.Imagefolder} ({self._est_tostring(valid_ext)}) 總共有 {total_images} 個檔案, 總大小: {self._format_size(total_size)}")
+
+        # ANSI escape codes for gold color
+        gold = '\033[33;1m'
+        reset = '\033[0m'
+
+        rate = total_images / TargetCount
+        print(f"{gold}目前 : {total_images} 張 距離 目標 {TargetCount} 張 還剩 {TargetCount - total_images} 張 , 完成率 = {rate:.2f} %{reset}\n\n")
+
+
+
+
+
 
     def _count_files_in_folder(self, folder_path, valid_ext):
         """

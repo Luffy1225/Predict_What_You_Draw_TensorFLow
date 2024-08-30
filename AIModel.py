@@ -8,7 +8,6 @@ from tensorflow.keras.datasets import mnist # type: ignore
 from tensorflow.keras.utils import to_categorical # type: ignore
 from tensorflow.keras.models import Sequential, load_model # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type: ignore
-import subprocess
 
 
 
