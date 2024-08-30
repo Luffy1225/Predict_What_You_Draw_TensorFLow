@@ -12,6 +12,7 @@ from AIModel import AI_Model
 
 class Predict_WhatUDraw_App:
 
+
     def init_tkinter(self, root):
         self.root = root
         self.root.title("Drawing App")
@@ -20,6 +21,10 @@ class Predict_WhatUDraw_App:
         self.image_size = 28
         # self.pixel_size = 10    # 每個像素的顯示大小
         
+        self.QuickSave = True
+
+
+
         #variable for pencil
         self.prevPoint = [0,0]
         self.currentPoint = [0,0]
@@ -29,8 +34,13 @@ class Predict_WhatUDraw_App:
         self.canvas = tk.Canvas(self.root, width=self.canvas_size, height=self.canvas_size, bg='black')
         self.canvas.grid(row=0, column=0, columnspan=4)  # 將畫布放在第一行，橫跨4列
         
+
+        # 動作 Binding
         self.canvas.bind("<B1-Motion>", self._paint)
         self.canvas.bind("<ButtonRelease-1>", self._paint_reset)
+
+        if (self.QuickSave):
+            self.root.bind("<Button-3>", self.Save_image)
         
         self.image = Image.new('RGB', (28, 28), 'black')
         self.draw = ImageDraw.Draw(self.image)
@@ -92,7 +102,7 @@ class Predict_WhatUDraw_App:
         self.Model = AI_Model(self.Model_combobox.get())
         self.save_image_path = self.Save_combobox.get()
     
-    def Save_image(self):
+    def Save_image(self, event=None):
         label = self.E_Correction.get()
 
         folder = os.path.join("images" , self.save_image_path)

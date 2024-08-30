@@ -13,7 +13,7 @@ PYTHON_EXT_LIST = ['py']
 class FolderManager:
     Default_Imagefolder = "images"
 
-    def __init__(self, imagefolder, valid_ext = None):
+    def __init__(self, imagefolder = "", valid_ext = None):
 
         if(imagefolder == ""):
             self.Imagefolder = self.Default_Imagefolder
@@ -22,7 +22,8 @@ class FolderManager:
        
         self.Valid_ext = valid_ext
 
-    def Count_File(self, valid_ext=None):
+
+    def Count_File(self ,valid_ext=None):
         if valid_ext is None:
             valid_ext = self.Valid_ext
 
@@ -187,17 +188,45 @@ class FolderManager:
 
 
 if __name__ == "__main__":
+    while True:
+        print("選擇一個操作:")
+        print("1. 建立資料夾結構")
+        print("2. 計數圖片檔案")
+        print("3. 導入圖片")
+        print("4. 退出")
+        print("如果直接按 Enter 鍵，預設執行計數圖片檔案")
 
-    # FolderManager.Build_Train_Folders()
-    
-    # while(True):
-    #     print(f"輸入 查詢的圖片資料夾.\n輸入 -1 退出(預設位置為: {FolderManager.Default_Imagefolder})")
-    #     Manage_Path = input("資料夾地址: ")
+        choice = input("輸入你的選擇 (1/2/3/4): ")
 
-    #     if(Manage_Path == "-1"):
-    #         break
-
-
-    #     manager = FolderManager(Manage_Path)
-    #     manager.Count_File(PICTURE_EXT_LIST)  # 輸入您需要的副檔名
-    FolderManager.Import_image_to_image("images", "New_Images")
+        if choice == '':
+            # 預設選擇計數圖片檔案
+            folder_path = input("請輸入圖片資料夾路徑 (預設為 'images'): ")
+            if not folder_path:
+                folder_path = "images"
+            manager = FolderManager(imagefolder=folder_path, valid_ext=PICTURE_EXT_LIST)
+            manager.Count_File()
+        
+        elif choice == '1':
+            # 建立資料夾結構
+            FolderManager.Build_Train_Folders()
+            print("資料夾結構已建立完畢。")
+        
+        elif choice == '2':
+            # 計數圖片檔案
+            folder_path = input("請輸入圖片資料夾路徑 (預設為 'images'): ")
+            if not folder_path:
+                folder_path = "images"
+            manager = FolderManager(imagefolder=folder_path, valid_ext=PICTURE_EXT_LIST)
+            manager.Count_File()
+        
+        elif choice == '3':
+            # 導入圖片
+            from_path = input("請輸入來源資料夾路徑: ")
+            to_path = input("請輸入目標資料夾路徑: ")
+            FolderManager.Import_image_to_image(from_path, to_path)
+        
+        else:
+            # 退出
+            print("退出程式...")
+            break
+        
