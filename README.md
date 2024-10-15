@@ -43,7 +43,7 @@ python AIModel.py
     提供多個訓練好的模型，讓用戶選擇並切換進行預測。
     
     > [!NOTE]
-    > 推薦 使用 `mnist_model_Epoch_60.h5` 模型
+    > 推薦 使用 `mnist_model_Epoch_100.keras` 模型
     
 
 1. 預測結果顯示：
