@@ -53,4 +53,4 @@ python AIModel.py
 5. Save Image:
     Drawn images can be saved locally as part of the training set.
 
-- [中文版](README_zh_TW.md)
+- [中文版 說明](README_zh_TW.md)
