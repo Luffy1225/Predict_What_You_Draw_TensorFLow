@@ -41,8 +41,8 @@ python AIModel.py
 2. Model Selection:
     Multiple pre-trained models are available for users to choose from and switch between for predictions.
 
-    > [!NOTE]
-    > It is recommended to use the mnist_model_Epoch_100.keras model.
+> [!NOTE]
+> It is recommended to use the mnist_model_Epoch_100.keras model.
 
 3. Prediction Result Display:
     The application displays the predicted digit below the canvas.
