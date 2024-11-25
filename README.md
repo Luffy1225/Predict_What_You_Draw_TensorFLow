@@ -53,4 +53,51 @@ python AIModel.py
 5. Save Image:
     Drawn images can be saved locally as part of the training set.
 
+
+## Structure of `images` Folder
+
+    images/
+    ├── ignore/                 # Ignored data, not used for training or testing
+    │   ├── label_1/            # Images for label 1
+    │   │   ├── 0.jpg           # Image file
+    │   │   ├── 1.jpg
+    │   │   └── ...             # More images
+    │   ├── label_2/            # Images for label 2
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   └── label_x/            # Images for other labels
+    │       ├── 0.jpg
+    │       ├── 1.jpg
+    │       └── ...
+    ├── test/                   # Test data, used for validating the model
+    │   ├── label_1/            # Test images for label 1
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   ├── label_2/            # Test images for label 2
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   └── label_x/            # Test images for other labels
+    │       ├── 0.jpg
+    │       ├── 1.jpg
+    │       └── ...
+    ├── train/                  # Training data, used for training the model
+    │   ├── label_1/            # Training images for label 1
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   ├── label_2/            # Training images for label 2
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   └── label_x/            # Training images for other labels
+    │       ├── 0.jpg
+    │       ├── 1.jpg
+    │       └── ...
+
+
+
+
 - [中文版 說明](README_zh_TW.md)

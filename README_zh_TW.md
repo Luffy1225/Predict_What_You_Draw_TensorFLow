@@ -14,8 +14,8 @@ pip install -r requirements.txt
 # Run
 
 > [!IMPORTANT]
-> 執行前先確認 images 資料夾存在 (否則找不到對應訓練集)
-> 可解壓縮 附帶圖片 images_DATE 並命名為 images
+> 執行前先確認 `images` 資料夾存在 (否則找不到對應訓練集)
+> 可解壓縮 附帶圖片 images_DATE 並命名為 `images`
 
 ## 開啟 Predict What You Draw
 
@@ -59,4 +59,49 @@ python AIModel.py
     可以將繪製的圖像保存到本機，以作做為訓練集。
 
 
+## `images` 資料夾 結構
+
+    images/
+    ├── ignore/                 # 忽略的資料，不用於訓練或測試
+    │   ├── label_1/            # 標籤 1 的圖片資料
+    │   │   ├── 0.jpg           # 圖片檔案
+    │   │   ├── 1.jpg
+    │   │   └── ...             # 更多圖片
+    │   ├── label_2/            # 標籤 2 的圖片資料
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   └── label_x/            # 其他標籤的圖片資料
+    │       ├── 0.jpg
+    │       ├── 1.jpg
+    │       └── ...
+    ├── test/                   # 測試數據，用於驗證模型
+    │   ├── label_1/            # 標籤 1 的測試圖片
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   ├── label_2/            # 標籤 2 的測試圖片
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   └── label_x/            # 其他標籤的測試圖片
+    │       ├── 0.jpg
+    │       ├── 1.jpg
+    │       └── ...
+    ├── train/                  # 訓練數據，用於訓練模型
+    │   ├── label_1/            # 標籤 1 的訓練圖片
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   ├── label_2/            # 標籤 2 的訓練圖片
+    │   │   ├── 0.jpg
+    │   │   ├── 1.jpg
+    │   │   └── ...
+    │   └── label_x/            # 其他標籤的訓練圖片
+    │       ├── 0.jpg
+    │       ├── 1.jpg
+    │       └── ...
+
+
+    
 - [English Version Instructions](README.md)
