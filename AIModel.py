@@ -210,8 +210,6 @@ class AI_Model:
 
     #region private function
 
-
-
     # 主要接口
     def _load_train_data(self, use_sel_train_data : bool = False): ## 仿製 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
@@ -348,45 +346,8 @@ class AI_Model:
         return valid
     
 
-    def _download_font(self): # (ABANDOM)不要使用 (請使用_check_and_download_font)
-        pass
-        # # 確保 font 資料夾存在
-        # os.makedirs('font', exist_ok=True)
 
-        # # 下載字型檔案
-        # url = "https://drive.google.com/uc?id=1eGAsTN1HBpJAkeVM57_C7ccp7hbgSz3_&export=download"
-        # output_file = 'font/taipei_sans_tc_beta.ttf'
-
-        # # 使用 wget 下載檔案
-        # try:
-        #     subprocess.run(['wget', '-O', output_file, url], check=True)
-        #     print(f'File downloaded successfully and saved to {output_file}')
-        # except subprocess.CalledProcessError as e:
-        #     print(f'Error occurred while downloading the file: {e}')
-
-    def _check_and_download_font(self, check_font_path):# (ABANDOM)
-        pass
-        # passflag = False
-
-        # if not os.path.exists(check_font_path):
-        #     print(f"找不到 font {check_font_path}")
-        #     print("嘗試自動下載...")
-
-        #     # 嘗試下載字型檔案
-        #     self._download_font()
-            
-        #     # 再次檢查字型檔案是否存在
-        #     if not os.path.exists(check_font_path):
-        #         print(f"字型檔案仍然不存在: {check_font_path}")
-        #         print("請手動下載字型檔案並將其放置在 'font' 資料夾中。")
-        #     else:
-        #         print(f"字型檔案下載成功: {check_font_path}")
-        #         passflag = True
-        # else:
-        #     print(f"字型檔案已存在: {check_font_path}")
-        #     passflag = True
-
-        # return passflag
+    
 
     #endregion
 

@@ -12,7 +12,6 @@ from AIModel import AI_Model
 
 class Predict_WhatUDraw_App:
 
-
     def init_tkinter(self, root):
         self.root = root
         self.root.title("Drawing App")
