@@ -2,6 +2,9 @@ import os
 import string
 import shutil
 
+import tensorflow as tf
+from PIL import Image
+
 PICTURE_EXT_LIST = ['.jpg', '.png']
 PYTHON_EXT_LIST = ['py']
 
@@ -188,6 +191,48 @@ class FolderManager:
         except Exception as e:
             print(f"導入圖像時發生錯誤: {e}")
 
+    @staticmethod
+    def Download_MNIST_DataSet(num_per_label=2000, output_dir="./mnist_images"):
+        # 下載 MNIST 資料集
+        (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
+
+        # 建立基礎資料夾結構
+        train_dir = os.path.join(output_dir, "train")
+        test_dir = os.path.join(output_dir, "test")
+        ignore_dir = os.path.join(output_dir, "ignore")
+        os.makedirs(train_dir, exist_ok=True)
+        os.makedirs(test_dir, exist_ok=True)
+        os.makedirs(ignore_dir, exist_ok=True)
+
+        # 建立每個標籤的子資料夾
+        for label in range(10):
+            os.makedirs(os.path.join(train_dir, str(label)), exist_ok=True)
+            os.makedirs(os.path.join(test_dir, str(label)), exist_ok=True)
+            os.makedirs(os.path.join(ignore_dir, str(label)), exist_ok=True)
+
+        # 記錄每個標籤的儲存數量
+        label_count = {i: 0 for i in range(10)}
+
+        total = 0
+        for i, (image, label) in enumerate(zip(x_train, y_train)):
+            # 如果該標籤已達到 num_per_label，跳過
+            if label_count[label] >= num_per_label:
+                continue
+
+            # 儲存圖片至 train 資料夾
+            label_dir = os.path.join(train_dir, str(label))
+            img = Image.fromarray(image)  # 轉換為 PIL 圖片
+            img.save(os.path.join(label_dir, f"{label_count[label]}.jpg"))
+
+            # 更新該標籤的儲存數量
+            label_count[label] += 1
+            total += 1
+
+            # 如果所有標籤都達到 num_per_label，結束
+            if all(count >= num_per_label for count in label_count.values()):
+                break
+
+        print(f"資料儲存完成！每個標籤的儲存數量：{num_per_label}, 總計: {total}")
 
 
 
@@ -201,10 +246,11 @@ if __name__ == "__main__":
         print("1. 建立資料夾結構")
         print("2. 計數圖片檔案")
         print("3. 導入圖片")
-        print("4. 退出")
+        print("4. 下載MNIST 訓練集")
+        print("其他. 退出")
         print("如果直接按 Enter 鍵，預設執行計數圖片檔案")
 
-        choice = input("輸入你的選擇 (1/2/3/4): ")
+        choice = input("輸入你的選擇: ")
 
         if choice == '':
             # 預設選擇計數圖片檔案
@@ -232,6 +278,10 @@ if __name__ == "__main__":
             from_path = input("請輸入來源資料夾路徑: ")
             to_path = input("請輸入目標資料夾路徑: ")
             FolderManager.Import_image_to_image(from_path, to_path)
+
+        elif choice == '4':
+           FolderManager.Download_MNIST_DataSet(2000, "./mnist_images")
+
         
         else:
             # 退出

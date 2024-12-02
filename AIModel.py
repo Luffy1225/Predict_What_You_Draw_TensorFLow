@@ -13,11 +13,27 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type:
 
 class AI_Model:
 
-    def __init__(self, default_model_name = "mnist_model_Epoch_60.h5"):
-        self.default_model_name = default_model_name
-        self.Model_Name = ""
-        # self.Model = self.Load_model(default_model_name)
-        self.Model = None
+    # def __init__(self, default_model_name = "mnist_model_Epoch_60.h5"):
+    #     self.default_model_name = default_model_name
+    #     self.Model_Name = ""
+    #     self.Model = self.SwitchModel(default_model_name)
+    #     self.Model = None
+
+    #     self.History = None  # 保存模型訓練過程中各種參數和結果
+
+    #     self.Train_SelfDataset_or_not = True  # 預設使用 自己 訓練集 訓練
+
+    #     self._train_flag = False
+    #     self._Epochs = -1
+
+    def __init__(self, _model_name = ""):
+
+        if(_model_name == ""): # 沒有設定model名稱 就取model 資料夾的第一位
+            self.Model_Name = self.Get_Models_list()[0]
+            self.Model = self.Load_model(self.Model_Name)
+        else:
+            self.Model_Name = _model_name
+            self.Model = self.Load_model(self.Model_Name)
 
         self.History = None  # 保存模型訓練過程中各種參數和結果
 
@@ -132,7 +148,7 @@ class AI_Model:
         train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
         test_images = test_images.reshape((test_images.shape[0], 28, 28, 1))
         train_labels = to_categorical(train_labels)
-        test_labels = to_categorical(test_labels)
+        test_labels = to_categorical(test_labels) # 沒有test 資料會出錯
 
 
         train_label_amount = len(train_labels[0])
@@ -196,7 +212,7 @@ class AI_Model:
         for index in range(len(model_list)):
             print(f"{index+1}. Model : {model_list[index]}")
 
-    def Get_Models_list(self):
+    def Get_Models_list(self): # Return Model list (names, not the real model)
 
         folder = "models"
         filenames = [f for f in os.listdir(folder)]
@@ -223,26 +239,29 @@ class AI_Model:
 
     def _get_train_image_and_label(self):
         path = os.path.join("images", "train")
-        image,label = self._image_and_label(path)
+        image,label = self._load_images_and_labels(path)
 
         return (image, label)
 
     def _get_test_image_and_label(self):
         path = os.path.join("images", "test")
-        image,label = self._image_and_label(path)
+        image,label = self._load_images_and_labels(path)
 
         return (image, label)
 
-    def _image_and_label(self,train_folder): # 取得 images 和 label 的 base function
-        # 指定訓練圖像資料夾的路徑
+    def _load_images_and_labels(self,folder): # 取得 images 和 label 的 base function
 
+        # 確保訓練資料夾存在且非空
+        if not os.path.exists(folder):
+            raise FileNotFoundError(f"資料夾 '{folder}' 不存在。")
+        
         # 創建一個空列表來儲存所有的圖像陣列和標籤
         image_list = []
         label_list = []
 
         # 遍歷資料夾中的所有類別資料夾
-        for class_label, class_name in enumerate(os.listdir(train_folder)):
-            class_folder = os.path.join(train_folder, class_name)
+        for class_label, class_name in enumerate(os.listdir(folder)):
+            class_folder = os.path.join(folder, class_name)
             
             if os.path.isdir(class_folder):  # 確保是資料夾
                 for filename in os.listdir(class_folder):
@@ -263,7 +282,11 @@ class AI_Model:
                         label_list.append(class_label)
                     
 
-        print(f"{train_folder} 裡面有 {len(image_list)} 張圖像")
+        print(f"{folder} 裡面有 {len(image_list)} 張圖像")
+
+        if (len(image_list) == 0):
+            raise FileNotFoundError(f"資料夾 '{folder}' 中沒有有效的圖像。")
+
 
         # 將圖像和標籤列表轉換為 NumPy 陣列
         images = np.array(image_list)

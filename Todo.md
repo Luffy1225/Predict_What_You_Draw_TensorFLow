@@ -2,6 +2,7 @@
 
 ## 主要目標
 
+ - [ ] 沒有test 資料會出錯 [AIModel.py line:151 test_labels = to_categorical(test_labels)] (提出時間 2024-11-25)
  - [ ] 將訓練資料分比例作為test data 跟 train data(提出時間 2024-11-19)
  - [ ] AIModel 測試性能 崩潰bug (提出時間 2024-08-30)
  - [ ] 新增 Config (供使用者 設定 Models 位置, image 位置 , 要不要邊新增資料邊訓練) (提出時間 2024-08-30)
