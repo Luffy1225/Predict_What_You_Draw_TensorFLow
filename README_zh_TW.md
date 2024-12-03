@@ -1,5 +1,7 @@
 ﻿# Predict_What_You_Draw
 
+- [English Version Instructions](README.md)
+
 這是一個基於 Tkinter 和 PIL 庫的手繪圖像識別應用程式。用戶可以在應用程式中手繪數字或 (英文)，並使用訓練好的 MNIST 模型 或是自行訓練 的模型 進行預測。
 
 # Install 
@@ -104,4 +106,3 @@ python AIModel.py
 
 
     
-- [English Version Instructions](README.md)

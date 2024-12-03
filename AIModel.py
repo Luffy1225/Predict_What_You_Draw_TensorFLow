@@ -13,19 +13,6 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type:
 
 class AI_Model:
 
-    # def __init__(self, default_model_name = "mnist_model_Epoch_60.h5"):
-    #     self.default_model_name = default_model_name
-    #     self.Model_Name = ""
-    #     self.Model = self.SwitchModel(default_model_name)
-    #     self.Model = None
-
-    #     self.History = None  # 保存模型訓練過程中各種參數和結果
-
-    #     self.Train_SelfDataset_or_not = True  # 預設使用 自己 訓練集 訓練
-
-    #     self._train_flag = False
-    #     self._Epochs = -1
-
     def __init__(self, _model_name = ""):
 
         if(_model_name == ""): # 沒有設定model名稱 就取model 資料夾的第一位
