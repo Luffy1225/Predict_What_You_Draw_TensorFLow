@@ -3,7 +3,6 @@
 ## Main Tasks
 
 - [ ] Split training data into proportions for test data and train data (submitted on 2024-11-19)
-- [ ] model = AI_Model() should be an empty model, not a default model (submitted on 2024-08-29)
 - [ ] Train while generating training data and training the current AI model (Reinforcement Learning, Incremental Learning) (submitted on 2024-08-29)
 - [ ] Complete an AI model that can recognize 0~9 and A~Z (submitted on 2024-08-28)
 
@@ -19,6 +18,8 @@
 
 ## Completed tasks (from top to bottom, recent to older)
 
+
+- ~~[ ] (abandoned) model = AI_Model() should be an empty model, not a default model (submitted on 2024-08-29)
 - ~~[x] Error when there is no test data (folder without data triggers an error) [AIModel.py line:151 test_labels = to_categorical(test_labels)] (submitted on 2024-11-25)~~
 - ~~[ ] (abandoned) Custom training set augmentation (filters, noise, rotation, etc.) (submitted on 2024-08-29)~~
 - ~~[ ] (abandoned) Custom training set - photo filter script (filters, noise, rotation, etc.) (submitted on 2024-08-29)~~
