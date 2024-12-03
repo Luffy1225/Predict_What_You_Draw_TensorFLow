@@ -27,7 +27,7 @@ class FolderManager:
             valid_ext = self.Valid_ext
 
         if not os.path.exists(self.Imagefolder):
-            print(f"資料夾 '{self.Imagefolder}' 不存在。")
+            print(f"Folder '{self.Imagefolder}' doesn't exist")
             return
 
         total_images = 0
@@ -35,7 +35,7 @@ class FolderManager:
 
         # 計算 Imagefolder 本身的照片
         folder_image_count, folder_size = self._count_files_in_folder(self.Imagefolder, valid_ext)
-        print(f"{self.Imagefolder} 底下有 {folder_image_count} 個檔案, 總大小: {self._format_size(folder_size)}")
+        print(f"Under {self.Imagefolder}, there are {folder_image_count} files, total size: {self._format_size(folder_size)}")
 
         total_images += folder_image_count
         total_size += folder_size
@@ -43,9 +43,9 @@ class FolderManager:
         # 計算子資料夾中的圖片
         subfolder_names = [d for d in os.listdir(self.Imagefolder) if os.path.isdir(os.path.join(self.Imagefolder, d)) and d != 'ignore']
 
-        print(f"{self.Imagefolder} 底下有 {len(subfolder_names)} 個資料夾 :")
+        print(f"Under {self.Imagefolder}, there are {subfolder_names} folders")
         for subfolder in subfolder_names:
-            print(f"資料夾名稱: {subfolder}")
+            print(f"Folder Name: {subfolder}")
             subfolder_path = os.path.join(self.Imagefolder, subfolder)
             label_folders = [d for d in os.listdir(subfolder_path) if os.path.isdir(os.path.join(subfolder_path, d))]
             subfolder_image_count = 0
@@ -57,29 +57,24 @@ class FolderManager:
                 
                 subfolder_image_count += image_count
                 subfolder_size += folder_size
-                print(f"  {label_folder}: {image_count} 個檔案, 大小: {self._format_size(folder_size)}")
+                print(f"{label_folder}: {image_count} files, size: {self._format_size(folder_size)}")
 
-            print(f"{subfolder} 總共有 {subfolder_image_count} 個檔案, 總大小: {self._format_size(subfolder_size)}\n")
+            print(f"{subfolder} has a total of {subfolder_image_count} files, size: {self._format_size(subfolder_size)}\n")
             total_images += subfolder_image_count
             total_size += subfolder_size
 
-        print(f"{self.Imagefolder} ({self._est_tostring(valid_ext)}) 總共有 {total_images} 個檔案, 總大小: {self._format_size(total_size)}")
+        print(f"{self.Imagefolder} ({self._ext_tostring(valid_ext)}) has a total of {total_images} files, total size: {self._format_size(total_size)}")
 
         # ANSI escape codes for gold color
         gold = '\033[33;1m'
         reset = '\033[0m'
 
         rate = total_images / TargetCount
-        print(f"{gold}目前 : {total_images} 張 距離 目標 {TargetCount} 張 還剩 {TargetCount - total_images} 張 , 完成率 = {rate:.2f} %{reset}\n\n")
-
-
-
-
-
+        print(f"{gold}Currently: {total_images} images. {TargetCount - total_images} images remaining to reach the target of {TargetCount} images. Completion rate = {rate:.2f} %{reset}\n\n")
 
     def _count_files_in_folder(self, folder_path, valid_ext):
         """
-        計算資料夾中的圖片數量和總大小，根據 valid_ext 過濾檔案
+        Calculate the number of images and total size in the folder, filtering files based on `valid_ext`.
         """
         if not os.path.exists(folder_path):
             return 0, 0
@@ -108,14 +103,14 @@ class FolderManager:
         return f"{size:.2f} TB"
 
     @staticmethod
-    def _est_tostring(valid_ext): # 把 副檔名 列表 轉換成 字串
+    def _ext_tostring(valid_ext): # Convert the list of file extensions into a string.
         if(valid_ext is not None):
             return " ".join(valid_ext)
         else:
-            return "沒有附檔名限制"
+            return "no EXT restriction"
 
     @classmethod
-    def Build_Train_Folders(cls):
+    def Build_DataSet_Folders(cls):
         base_folder = cls.Default_Imagefolder
         subfolders = ["ignore", "train", "test"]
 
@@ -137,10 +132,10 @@ class FolderManager:
             for letter in letters:
                 os.makedirs(os.path.join(subfolder_path, letter), exist_ok=True)
 
-        print(f"{base_folder} 資料夾結構已建立完畢。")
+        print(f"Folder :'{base_folder}' has been created.")
 
     @staticmethod
-    def Import_image_to_image(frompath, to_path):
+    def Import_image_to_image(frompath, to_path):  # HASN't TEST YET
         try:
             # 確認來源資料夾是否存在
             if not os.path.isdir(frompath):
@@ -193,7 +188,7 @@ class FolderManager:
 
     @staticmethod
     def Download_MNIST_DataSet(num_per_label=2000, output_dir="./mnist_images"):
-        # 下載 MNIST 資料集
+        # download MNIST dataset
         (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
 
         # 建立基礎資料夾結構
@@ -232,7 +227,7 @@ class FolderManager:
             if all(count >= num_per_label for count in label_count.values()):
                 break
 
-        print(f"資料儲存完成！每個標籤的儲存數量：{num_per_label}, 總計: {total}")
+        print(f"Save complete! Number of images stored per label: {num_per_label}, total: {total}")
 
 
 
@@ -242,49 +237,57 @@ class FolderManager:
 
 if __name__ == "__main__":
     while True:
-        print("選擇一個操作:")
-        print("1. 建立資料夾結構")
-        print("2. 計數圖片檔案")
-        print("3. 導入圖片")
-        print("4. 下載MNIST 訓練集")
-        print("其他. 退出")
-        print("如果直接按 Enter 鍵，預設執行計數圖片檔案")
+        print("\n\n")
+        print("Choose an operation:")
+        print("1. Create folder structure")
+        print("2. Count image files")
+        print("3. Import images")
+        print("4. Download MNIST training set")
+        print("Other. Exit")
+        print("Press Enter to default to counting image files")
 
-        choice = input("輸入你的選擇: ")
+        choice = input("Enter your choice: ")
+        print("\n")
+
 
         if choice == '':
-            # 預設選擇計數圖片檔案
-            folder_path = input("請輸入圖片資料夾路徑 (預設為 'images'): ")
+            # Default choice: Count image files
+            folder_path = input("Please enter the path to the image folder (default is 'images'): ")
             if not folder_path:
                 folder_path = "images"
             manager = FolderManager(imagefolder=folder_path, valid_ext=PICTURE_EXT_LIST)
             manager.Count_File()
         
         elif choice == '1':
-            # 建立資料夾結構
-            FolderManager.Build_Train_Folders()
-            print("資料夾結構已建立完畢。")
+            # Build the DataSet Folder
+            FolderManager.Build_DataSet_Folders()
+            print("The folder structure has been created.")
         
         elif choice == '2':
-            # 計數圖片檔案
-            folder_path = input("請輸入圖片資料夾路徑 (預設為 'images'): ")
+            # Count Image
+            folder_path = input("Please enter the path to the image folder (default is 'images'): ")
             if not folder_path:
                 folder_path = "images"
             manager = FolderManager(imagefolder=folder_path, valid_ext=PICTURE_EXT_LIST)
             manager.Count_File()
         
         elif choice == '3':
-            # 導入圖片
-            from_path = input("請輸入來源資料夾路徑: ")
-            to_path = input("請輸入目標資料夾路徑: ")
+            # Import Image
+            from_path = input("Please enter the 'SOURCE' folder path: ")
+            to_path = input("Please enter the 'DESTINATION'folder path: ")
             FolderManager.Import_image_to_image(from_path, to_path)
 
         elif choice == '4':
-           FolderManager.Download_MNIST_DataSet(2000, "./mnist_images")
+           
+           print("Please enter how many images are needed for each label. (Recommand: 2000)")
+           count = int(input("Count:"))
+
+           if(count > 2000):
+               print("Too big.") 
+           FolderManager.Download_MNIST_DataSet(count, "./mnist_images")
 
         
         else:
-            # 退出
-            print("退出程式...")
+            print("Exit...")
             break
         

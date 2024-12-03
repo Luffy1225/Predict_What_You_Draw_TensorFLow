@@ -15,23 +15,22 @@ class AI_Model:
 
     def __init__(self, _model_name = ""):
 
-        if(_model_name == ""): # 沒有設定model名稱 就取model 資料夾的第一位
+        if(_model_name == ""): # If the model name is not specified, use the first entry in the model folder.
             self.Model_Name = self.Get_Models_list()[0]
             self.Model = self.Load_model(self.Model_Name)
         else:
             self.Model_Name = _model_name
             self.Model = self.Load_model(self.Model_Name)
 
-        self.History = None  # 保存模型訓練過程中各種參數和結果
+        self.History = None  # Save  parameters and results during the model training process
 
-        self.Train_SelfDataset_or_not = True  # 預設使用 自己 訓練集 訓練
+        self.Train_SelfDataset_or_not = True  # True: Using my own training dataset. Else: MNIST dataset.
 
         self._train_flag = False
         self._Epochs = -1
 
 
-    def Load_model(self,model_filename = "" ):
-        # model_filename = 'mnist_model_Epoch_60.h5'  # 修改為實際模型文件名
+    def Load_model(self,model_filename = "" ): # load model by the filename
         
         model_valid =  self._select_model_Valid(model_filename)
 
@@ -46,14 +45,14 @@ class AI_Model:
         
         self.Model = load_model(model_path)
         if self.Model is not None:
-            print(f"模型: {model_path} 成功載入")
+            print(f"Model: {model_path} load SUCCESSFULLY")
         else:
-            print(f"模型: {model_path} 載入失敗")
+            print(f"Model: {model_path} load FAIL")
         return self.Model
 
 
-    def Predict_imageS(self, image_folder): ## Predict 多張圖片 的base function
-        # 獲取資料夾中的所有檔案
+    def Predict_imageS(self, image_folder): ## Predict multiple Image  的base function
+        # get all the image with .png
         filenames = [f for f in os.listdir(image_folder) if f.endswith('.png')]
         images = []
         valid_filenames = []
@@ -66,7 +65,7 @@ class AI_Model:
                 valid_filenames.append(filename)
         
         if len(images) == 0:
-            print("沒有有效的圖片進行預測。")
+            print("There are no valid images for prediction.")
             return valid_filenames, [], []
         
         images = np.array(images)
@@ -82,11 +81,10 @@ class AI_Model:
 
         return predicted_label
 
-    def Predict(self, image): # Predict 單張圖片 的base function
+    def Predict(self, image): # Predict the Single image  的base function
 
         if(self.Model is not None):
 
-            # img = PIL Image 
             img = self._load_and_preprocess_image(image) 
 
             img = np.expand_dims(img, axis=0)  # 增加一維以匹配模型輸入
@@ -103,10 +101,10 @@ class AI_Model:
 
     def EvaluatePerformance(self):
         if self.Model is None:
-            print("模型尚未載入，請先載入模型")
+            print("The model has not been loaded yet. Please load the model first.")
             return
         
-        (train_images, train_labels), (test_images, test_labels) = self._load_train_data(self.Train_SelfDataset_or_not)
+        (train_images, train_labels), (test_images, test_labels) = self._load_dataset(self.Train_SelfDataset_or_not)
 
         # 數據預處理
         train_images = train_images.astype('float32') / 255
@@ -118,33 +116,34 @@ class AI_Model:
 
         test_loss, test_acc = self.Model.evaluate(test_images, test_labels)
 
-        print(f'測試集準確度: {test_acc:.4f}')
+        print(f'Test set accuracy: {test_acc:.4f}')
 
         if self._train_flag:
             self._visulizePerformance()
         else:
-            print("模型尚未訓練，無法顯示訓練過程。")
+            print("The model has not been trained, so the training process cannot be displayed.")
 
-    def Train_Model(self, Save_Model = False , epochs = 5): # 訓練模型的base function
+    def Train_Model(self, Save_Model = False , epochs = 5): # 
         
-        (train_images, train_labels), (test_images, test_labels) = self._load_train_data(self.Train_SelfDataset_or_not)  # 預計接口
+        (train_images, train_labels), (test_images, test_labels) = self._load_dataset(self.Train_SelfDataset_or_not)  # 預計接口
 
-        # 數據預處理
+        # preprocess
         train_images = train_images.astype('float32') / 255
         test_images = test_images.astype('float32') / 255
         train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
         test_images = test_images.reshape((test_images.shape[0], 28, 28, 1))
         train_labels = to_categorical(train_labels)
-        test_labels = to_categorical(test_labels) # 沒有test 資料會出錯
+        test_labels = to_categorical(test_labels) 
 
 
         train_label_amount = len(train_labels[0])
-        print(f"Train 有{train_label_amount}個label")
+        print(f"Train has {train_label_amount} labels")
         test_label_amount = len(test_labels[0])
-        print(f"Test 有{test_label_amount}個label")
+        print(f"Test has {test_label_amount} labels")
 
 
-        # 假設這是你的模型定義和訓練代碼
+
+        # Model
         model = Sequential([
             Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
             MaxPooling2D((2, 2)),
@@ -159,7 +158,7 @@ class AI_Model:
                     loss='categorical_crossentropy',
                     metrics=['accuracy'])
 
-        # 訓練模型
+        # training
         self._Epochs = epochs
 
         self.History = model.fit(train_images, train_labels, epochs=self._Epochs, batch_size=64, validation_split=0.2)
@@ -176,15 +175,14 @@ class AI_Model:
 
         if self.Model is not None:
 
-            models_path = "models"  # 保存路徑資料夾
+            models_path = "models"  # Root folder 
             
-            # 保存模型
-            # model_name = self.Model_Name # 模型名稱
-            model_name = Model_name # 模型名稱
+            # save model
+            model_name = Model_name # model name
             model_full_name = f'{model_name}_Epoch_{ self._Epochs}.keras'
             model_full_name = os.path.join(models_path, model_full_name)
 
-            print(f"Model {model_name}保存到: {model_full_name}")
+            print(f"Save Model {model_name} to: {model_full_name}")
 
             self.Model.save(model_full_name)
         else:
@@ -193,7 +191,7 @@ class AI_Model:
     def New_Model(self, name):
         self.Model_Name = name
 
-    def Print_Model_List(self):
+    def Print_Model_List(self): # list out all the models in "models" folder
         model_list = self.Get_Models_list()
 
         for index in range(len(model_list)):
@@ -213,8 +211,8 @@ class AI_Model:
 
     #region private function
 
-    # 主要接口
-    def _load_train_data(self, use_sel_train_data : bool = False): ## 仿製 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+    
+    def _load_dataset(self, use_sel_train_data : bool = False): ## mock (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
         if(use_sel_train_data):
             (train_images, train_labels) = self._get_train_image_and_label()
@@ -236,13 +234,13 @@ class AI_Model:
 
         return (image, label)
 
-    def _load_images_and_labels(self,folder): # 取得 images 和 label 的 base function
+    def _load_images_and_labels(self,folder): # get the images and labels 
 
-        # 確保訓練資料夾存在且非空
+        # make sure the folder existed
         if not os.path.exists(folder):
-            raise FileNotFoundError(f"資料夾 '{folder}' 不存在。")
+            raise FileNotFoundError(f"Folder '{folder}' NOT FOUND")
         
-        # 創建一個空列表來儲存所有的圖像陣列和標籤
+        # new a list to keep those images and label
         image_list = []
         label_list = []
 
@@ -269,10 +267,10 @@ class AI_Model:
                         label_list.append(class_label)
                     
 
-        print(f"{folder} 裡面有 {len(image_list)} 張圖像")
+        print(f"{folder} has {len(image_list)} images")
 
         if (len(image_list) == 0):
-            raise FileNotFoundError(f"資料夾 '{folder}' 中沒有有效的圖像。")
+            raise FileNotFoundError(f"Folder '{folder}' has no Valid image")
 
 
         # 將圖像和標籤列表轉換為 NumPy 陣列
@@ -283,7 +281,7 @@ class AI_Model:
 
 
     def _visulizePerformance(self):  
-        _ , (test_images, test_labels) = self._load_train_data()  # 預計接口
+        _ , (test_images, test_labels) = self._load_dataset()  # 預計接口
 
         # 視覺化訓練過程
         if(self.History is not None):   
@@ -292,10 +290,9 @@ class AI_Model:
             _font_name = 'taipei_sans_tc_beta.ttf'
             font_path = os.path.join("font",_font_name)
 
-
             if( not os.path.exists(font_path)):
 
-                print(f"找不到 font {font_path}")
+                print(f"Can't found font {font_path}")
                 return
             
             matplotlib.font_manager.fontManager.addfont(font_path)
@@ -305,18 +302,19 @@ class AI_Model:
             plt.figure(figsize=(12, 4))
 
             plt.subplot(1, 2, 1)
-            plt.plot(self.History.history['accuracy'], label='訓練準確度')
-            plt.plot(self.History.history['val_accuracy'], label='驗證準確度')
-            plt.xlabel('訓練週期')
-            plt.ylabel('準確度')
+            plt.plot(self.History.history['accuracy'], label='Training Accuracy')
+            plt.plot(self.History.history['val_accuracy'], label='Validation Accuracy')
+            plt.xlabel('Epochs')
+            plt.ylabel('Accuracy')
             plt.legend()
 
             plt.subplot(1, 2, 2)
-            plt.plot(self.History.history['loss'], label='訓練損失')
-            plt.plot(self.History.history['val_loss'], label='驗證損失')
-            plt.xlabel('訓練週期')
-            plt.ylabel('損失')
+            plt.plot(self.History.history['loss'], label='Training Loss')
+            plt.plot(self.History.history['val_loss'], label='Validation Loss')
+            plt.xlabel('Epochs')
+            plt.ylabel('Loss')
             plt.legend()
+
 
             plt.show()
 
@@ -329,7 +327,7 @@ class AI_Model:
     
         # 檢查 img 是否為 numpy 陣列
         if not isinstance(img, np.ndarray):
-            print(f"無效的圖片數據類型: {type(img)}")
+            print(f"Invalid image data type: {type(img)}")
             return None
         
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # 灰階
@@ -349,9 +347,9 @@ class AI_Model:
                 break
         
         if(valid):
-            print(f"成功找到 Model: : {model_name}")
+            print(f"Find Model: {model_name}")
         else:
-            print(f"未找到 Model: {model_name}")
+            print(f"Couldn't Find the Model: {model_name}")
 
         return valid
     
@@ -370,37 +368,42 @@ if __name__ == '__main__':
 
     while(True):
         print("\n\n")
-        print("1. 建立新Model")
-        print("2. 載入Model")
-        print("3. 開始訓練Model")
-        print("4. 測試性能")
-        print("5. 保存Model")
-        print("其他. 退出")
-        input_str = input("輸入功能:(1~5):  ")
+        print("1. Create a New Model")
+        print("2. Load an Existing Model")
+        print("3. Start Training")
+        print("4. Test Performance")
+        print("5. Save the Model")
+        print("Other: EXIT")
+
+        input_str = input("Enter a function (1~5): ")
+
 
 
         if(input_str == "1"):
             Model = AI_Model()
-            print("\n\n已建立新Model\n\n")
+            print("\n\nA new model has been created.\n\n")
         elif(input_str == "2"):
             Model.Print_Model_List()
-            select_model = input("請輸入要載入的Model : ")
+            select_model = input("Enter the name of the model to load: ")
             Model.Load_model(select_model)
         elif(input_str == "3"):
-            mnistOrNOtstr = input("要不要用 MNIST訓練集, 不要 : 使用自己的images訓練集 (y/n)")
+            mnistOrNotStr = input("Do you want to use the MNIST dataset for training? Enter 'n' to use your own images dataset (y/n): ")
             
-            if(mnistOrNOtstr == "y"): Model.Train_SelfDataset_or_not = False
-            else: Model.Train_SelfDataset_or_not = True
+            if(mnistOrNotStr == "y"):
+                Model.Train_SelfDataset_or_not = False
+            else:
+                Model.Train_SelfDataset_or_not = True
 
-            in_epoch = int(input("輸入訓練週期(Epochs): "))
-            Model.Train_Model(epochs = in_epoch)
+            in_epoch = int(input("Enter the number of training epochs: "))
+            Model.Train_Model(epochs=in_epoch)
         elif(input_str == "4"):
             Model.EvaluatePerformance()
         elif(input_str == "5"):
-            save_model_name = input("輸入 新Model名稱: ")
+            save_model_name = input("Enter the name for the new model: ")
             Model.Save_Model(save_model_name)
         else:
             break
+
 
 
 
