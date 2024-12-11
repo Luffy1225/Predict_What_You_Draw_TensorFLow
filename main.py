@@ -234,14 +234,14 @@ class Predict_WhatUDraw_App:
 
     def _Model_combobox_on_combobox_select(self, event):
         # 獲取選擇的模型
-        selected_model_text = self.Model_combobox.get()
+        selected_model_name = self.Model_combobox.get()
 
-        model_folder = "Models"
-        selected_model_path = os.path.join(model_folder, selected_model_text)
+        # model_folder = "Models"
+        # selected_model_path = os.path.join(model_folder, selected_model_text)
 
-        self.Model.SwitchModel(selected_model_path)
+        self.Model.SwitchModel(selected_model_name)
 
-        print(f"Selected Model: {selected_model_path}")
+        print(f"Selected Model: {selected_model_name}")
 
     def _get_save_Path_list(self):
         folder = "images"

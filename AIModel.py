@@ -9,14 +9,14 @@ from tensorflow.keras.utils import to_categorical # type: ignore
 from tensorflow.keras.models import Sequential, load_model # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type: ignore
 
-
-
 class AI_Model:
 
     def __init__(self, _model_name = ""):
 
+        self.default_model_name = self.Get_Models_List()[0]
+
         if(_model_name == ""): # If the model name is not specified, use the first entry in the model folder.
-            self.Model_Name = self.Get_Models_list()[0]
+            self.Model_Name = self.default_model_name
             self.Model = self.Load_model(self.Model_Name)
         else:
             self.Model_Name = _model_name
@@ -30,7 +30,28 @@ class AI_Model:
         self._Epochs = -1
 
 
-    def Load_model(self,model_filename = "" ): # load model by the filename
+    def Load_model(self,model_filename = "" ): # load model by the filename, Load "models/model_name/model_name.keras"
+        
+        model_valid =  self._select_model_Valid(model_filename)
+
+        if(not model_valid):
+            model_filename = self.default_model_name
+
+        self.Model_Name = model_filename.split('.')[0]  # 使用 split 分割字串，取出第一部分
+
+        model_folder = 'models'
+        model_path = os.path.join(model_folder, model_filename)
+        model_path = os.path.join(model_path, model_filename + ".keras") # Ex: models/model_name/model_name.keras
+
+
+        self.Model = load_model(model_path)
+        if self.Model is not None:
+            print(f"Model: {model_path} load SUCCESSFULLY")
+        else:
+            print(f"Model: {model_path} load FAIL")
+        return self.Model
+
+    def ___BackUP_Load_model(self,model_filename = "" ): # load model by the filename
         
         model_valid =  self._select_model_Valid(model_filename)
 
@@ -96,8 +117,8 @@ class AI_Model:
         else:
             print("Model is None, Please Select Model or New a Model.")
 
-    def SwitchModel(self, model_path):
-        self.Model = load_model(model_path)
+    def SwitchModel(self, model_name): # Switch the model by "Mode name" EX: "model_name_Epoch_100"
+        self.Model = self.Load_model(model_name)
 
     def EvaluatePerformance(self):
         if self.Model is None:
@@ -192,22 +213,31 @@ class AI_Model:
         self.Model_Name = name
 
     def Print_Model_List(self): # list out all the models in "models" folder
-        model_list = self.Get_Models_list()
+        model_list = self.Get_Models_List()
 
         for index in range(len(model_list)):
             print(f"{index+1}. Model : {model_list[index]}")
-
-    def Get_Models_list(self): # Return Model list (names, not the real model)
-
+    
+    def Get_Models_List(self): # Return Valid Model list (names, not the real model)
         folder = "models"
-        filenames = [f for f in os.listdir(folder)]
+        all_items = os.listdir(folder)
 
-        model_list = []
+        all_models = []
 
-        for filename in filenames:
-            model_list.append(filename)
+        for model_name in all_items:
+            item_path = os.path.join(folder, model_name)
 
-        return model_list
+            # If the model_name is Folder 
+            if os.path.isdir(item_path):
+                item_path = os.path.join(item_path, model_name)
+
+                ext = ".json" 
+                print(item_path + ext)
+                if (os.path.exists(item_path + ext)): # Does the Mapping file exist?
+                    all_models.append(model_name)
+
+        return all_models
+    
 
     #region private function
 
@@ -221,6 +251,16 @@ class AI_Model:
             (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
         return (train_images, train_labels) ,(test_images, test_labels)
+
+    def _load_EMNIST(self):# NOT YETTTTT
+        (train_images, train_labels), (test_images, test_labels) = None # NOT YETTTTT
+        return (train_images, train_labels) ,(test_images, test_labels)
+
+    def _load_MNIST(self):
+        (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+        return (train_images, train_labels) ,(test_images, test_labels)
+
+
 
     def _get_train_image_and_label(self):
         path = os.path.join("images", "train")
@@ -245,6 +285,7 @@ class AI_Model:
         label_list = []
 
         # 遍歷資料夾中的所有類別資料夾
+        
         for class_label, class_name in enumerate(os.listdir(folder)):
             class_folder = os.path.join(folder, class_name)
             
@@ -338,7 +379,7 @@ class AI_Model:
         return img
 
     def _select_model_Valid(self, model_name):
-        model_list = self.Get_Models_list()
+        model_list = self.Get_Models_List()
 
         valid = False
         for model in model_list:
@@ -353,8 +394,7 @@ class AI_Model:
 
         return valid
     
-
-
+    
     
 
     #endregion
@@ -384,11 +424,13 @@ if __name__ == '__main__':
             print("\n\nA new model has been created.\n\n")
         elif(input_str == "2"):
             Model.Print_Model_List()
-            select_model = input("Enter the name of the model to load: ")
+            select_model = input("Enter the 'name' of the model to load: ")
             Model.Load_model(select_model)
         elif(input_str == "3"):
             mnistOrNotStr = input("Do you want to use the MNIST dataset for training? Enter 'n' to use your own images dataset (y/n): ")
             
+            EmnistOrNotStr = input("Using EMNIST(y)/MNIST(n) dataset for training? 'y' for EMNIST, 'n' for MNIST: ")
+
             if(mnistOrNotStr == "y"):
                 Model.Train_SelfDataset_or_not = False
             else:
@@ -396,6 +438,8 @@ if __name__ == '__main__':
 
             in_epoch = int(input("Enter the number of training epochs: "))
             Model.Train_Model(epochs=in_epoch)
+            Model.EvaluatePerformance()
+
         elif(input_str == "4"):
             Model.EvaluatePerformance()
         elif(input_str == "5"):
