@@ -53,6 +53,8 @@ class AI_Model:
 
 
         self.Model = load_model(model_path)
+        self.Label_Mapping = self._load_label_file()
+        
         if self.Model is not None:
             print(f"Model: {model_path} load SUCCESSFULLY")
         else:
