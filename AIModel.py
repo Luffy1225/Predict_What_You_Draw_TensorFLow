@@ -1,7 +1,12 @@
+#region Import
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.figure import Figure
+from matplotlib.ticker import MaxNLocator
+import json
 from PIL import Image
 import cv2
 from tensorflow.keras.datasets import mnist # type: ignore
@@ -9,11 +14,15 @@ from tensorflow.keras.utils import to_categorical # type: ignore
 from tensorflow.keras.models import Sequential, load_model # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type: ignore
 
+#endregion
+
+
 class AI_Model:
 
     def __init__(self, _model_name = ""):
 
         self.default_model_name = self.Get_Models_List()[0]
+        self.target_dataset = "custom" # using my own dataset as Default
 
         if(_model_name == ""): # If the model name is not specified, use the first entry in the model folder.
             self.Model_Name = self.default_model_name
@@ -24,11 +33,10 @@ class AI_Model:
 
         self.History = None  # Save  parameters and results during the model training process
 
-        self.Train_SelfDataset_or_not = True  # True: Using my own training dataset. Else: MNIST dataset.
-
         self._train_flag = False
         self._Epochs = -1
 
+    #region Public function
 
     def Load_model(self,model_filename = "" ): # load model by the filename, Load "models/model_name/model_name.keras"
         
@@ -50,27 +58,6 @@ class AI_Model:
         else:
             print(f"Model: {model_path} load FAIL")
         return self.Model
-
-    def ___BackUP_Load_model(self,model_filename = "" ): # load model by the filename
-        
-        model_valid =  self._select_model_Valid(model_filename)
-
-        if(not model_valid):
-            model_filename = self.default_model_name
-
-        self.Model_Name = model_filename.split('.')[0]  # 使用 split 分割字串，取出第一部分
-
-        model_folder = 'models'
-        model_path = os.path.join(model_folder, model_filename)
-
-        
-        self.Model = load_model(model_path)
-        if self.Model is not None:
-            print(f"Model: {model_path} load SUCCESSFULLY")
-        else:
-            print(f"Model: {model_path} load FAIL")
-        return self.Model
-
 
     def Predict_imageS(self, image_folder): ## Predict multiple Image  的base function
         # get all the image with .png
@@ -125,7 +112,7 @@ class AI_Model:
             print("The model has not been loaded yet. Please load the model first.")
             return
         
-        (train_images, train_labels), (test_images, test_labels) = self._load_dataset(self.Train_SelfDataset_or_not)
+        (train_images, train_labels), (test_images, test_labels) = self._load_dataset()
 
         # 數據預處理
         train_images = train_images.astype('float32') / 255
@@ -146,7 +133,7 @@ class AI_Model:
 
     def Train_Model(self, Save_Model = False , epochs = 5): # 
         
-        (train_images, train_labels), (test_images, test_labels) = self._load_dataset(self.Train_SelfDataset_or_not)  # 預計接口
+        (train_images, train_labels), (test_images, test_labels) = self._load_dataset()  # 預計接口
 
         # preprocess
         train_images = train_images.astype('float32') / 255
@@ -192,20 +179,35 @@ class AI_Model:
         self._train_flag = True
         return model
 
-    def Save_Model(self, Model_name = None):
+    def Save_Model(self, _model_name = None):
 
         if self.Model is not None:
 
             models_path = "models"  # Root folder 
+
+            _model_name = f'{_model_name}_Epoch_{ self._Epochs}' # model name EX: "model_name_Epoch_100"
+            self.Model_Name = _model_name # model name
+
+            models_path = os.path.join(models_path, _model_name) # models/model_name_Epoch_100
+
+            #mkdir models folder
+            if not os.path.exists(models_path):
+                os.mkdir(models_path)
             
             # save model
-            model_name = Model_name # model name
-            model_full_name = f'{model_name}_Epoch_{ self._Epochs}.keras'
-            model_full_name = os.path.join(models_path, model_full_name)
-
-            print(f"Save Model {model_name} to: {model_full_name}")
+            model_full_name = _model_name + ".keras"
+            model_full_name = os.path.join(models_path, model_full_name) # models\\testing_Epoch_5\\testing_Epoch_5.keras
 
             self.Model.save(model_full_name)
+            print(f"Save Model {_model_name} to: {model_full_name}")
+
+            # save label file
+            label_full_name = _model_name + ".json"
+            label_full_name = os.path.join(models_path, label_full_name) # models\\testing_Epoch_5\\testing_Epoch_5.json
+            self._save_label_file(label_full_name)
+            print(f"Save Label File to: {label_full_name}")
+
+
         else:
             print("Model is None.")
 
@@ -238,17 +240,22 @@ class AI_Model:
 
         return all_models
     
+    #endregion
 
     #region private function
 
     
-    def _load_dataset(self, use_sel_train_data : bool = False): ## mock (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+    def _load_dataset(self): ## mock (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
-        if(use_sel_train_data):
+        if (self.target_dataset == "mnist"):
+            (train_images, train_labels), (test_images, test_labels) = self._load_MNIST()
+        elif (self.target_dataset == "Emnist"):
+            (train_images, train_labels), (test_images, test_labels) = self._load_EMNIST()
+        elif(self.target_dataset == "custom"): # Using your own Data_set
             (train_images, train_labels) = self._get_train_image_and_label()
             (test_images, test_labels) = self._get_test_image_and_label()
         else:
-            (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+            raise ValueError(f"Didn't select the target dataset")
 
         return (train_images, train_labels) ,(test_images, test_labels)
 
@@ -260,7 +267,11 @@ class AI_Model:
         (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
         return (train_images, train_labels) ,(test_images, test_labels)
 
-
+    def _load_label_mapping(self):
+        json_path = os.path.join("models", self.Model_Name, self.Model_Name + ".json")
+        with open(json_path, 'r') as f:
+            label_mapping = json.load(f)
+        return label_mapping
 
     def _get_train_image_and_label(self):
         path = os.path.join("images", "train")
@@ -275,6 +286,56 @@ class AI_Model:
         return (image, label)
 
     def _load_images_and_labels(self,folder): # get the images and labels 
+
+        # make sure the folder existed
+        if not os.path.exists(folder):
+            raise FileNotFoundError(f"Folder '{folder}' NOT FOUND")
+        
+        # new a list to keep those images and label
+        image_list = []
+        label_list = []
+
+        # 遍歷資料夾中的所有類別資料夾
+        self.Label_Mapping = {}
+
+        # class_trainlabel : int   , class_label : string of the label
+        for class_trainlabel, class_label in enumerate(os.listdir(folder)):
+            class_folder = os.path.join(folder, class_label)
+            
+            if os.path.isdir(class_folder):  # 確保是資料夾
+                for filename in os.listdir(class_folder):
+                    if filename.endswith(".png") or filename.endswith(".jpg") or filename.endswith(".jpeg"):
+                        # 構建完整的圖像路徑
+                        image_path = os.path.join(class_folder, filename)
+                        
+                        # 使用 PIL 打開圖像並轉換為灰度圖像
+                        img = Image.open(image_path).convert('L')
+                        
+                        # 將圖像轉換為 NumPy 陣列
+                        img_array = np.array(img)
+                        
+                        # 將圖像陣列添加到列表中
+                        image_list.append(img_array)
+                        
+                        # 將標籤（類別索引）添加到標籤列表中
+                        label_list.append(class_trainlabel)
+
+            self.Label_Mapping[class_label] = class_trainlabel
+                    
+
+        print(f"{folder} has {len(image_list)} images")
+
+        if (len(image_list) == 0):
+            raise FileNotFoundError(f"Folder '{folder}' has no Valid image")
+
+
+        # 將圖像和標籤列表轉換為 NumPy 陣列
+        images = np.array(image_list)
+        labels = np.array(label_list)
+
+        return (images, labels)
+
+    def BACKUP_load_images_and_labels(self,folder): # get the images and labels 
 
         # make sure the folder existed
         if not os.path.exists(folder):
@@ -320,7 +381,6 @@ class AI_Model:
 
         return (images, labels)
 
-
     def _visulizePerformance(self):  
         _ , (test_images, test_labels) = self._load_dataset()  # 預計接口
 
@@ -339,22 +399,29 @@ class AI_Model:
             matplotlib.font_manager.fontManager.addfont(font_path)
             matplotlib.rc('font', family='Taipei Sans TC Beta')
 
-
             plt.figure(figsize=(12, 4))
 
+            _draw_epoch = []
+            for i in range(1,len(self.History.history['accuracy'])+1):
+                _draw_epoch.append(i)
+
             plt.subplot(1, 2, 1)
-            plt.plot(self.History.history['accuracy'], label='Training Accuracy')
-            plt.plot(self.History.history['val_accuracy'], label='Validation Accuracy')
+            plt.plot(_draw_epoch ,self.History.history['accuracy'], label='Training Accuracy')
+            plt.plot(_draw_epoch , self.History.history['val_accuracy'], label='Validation Accuracy')
             plt.xlabel('Epochs')
             plt.ylabel('Accuracy')
             plt.legend()
+            plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))  # 設置 x 軸顯示整數刻度
+
+
 
             plt.subplot(1, 2, 2)
-            plt.plot(self.History.history['loss'], label='Training Loss')
-            plt.plot(self.History.history['val_loss'], label='Validation Loss')
+            plt.plot(_draw_epoch ,self.History.history['loss'], label='Training Loss')
+            plt.plot(_draw_epoch ,self.History.history['val_loss'], label='Validation Loss')
             plt.xlabel('Epochs')
             plt.ylabel('Loss')
             plt.legend()
+            plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))  # 設置 x 軸顯示整數刻度
 
 
             plt.show()
@@ -394,8 +461,28 @@ class AI_Model:
 
         return valid
     
+    def _save_label_file(self, label_full_name): # write the label mapping to the json file
+        json_path = label_full_name
+
+        with open(json_path, 'w') as f:
+            json.dump(self.Label_Mapping, f)
     
-    
+    def _load_label_file(self): # load the label mapping from the json file
+        json_path = os.path.join("models", self.Model_Name, self.Model_Name + ".json")
+        
+        if not os.path.exists(json_path):
+            return None
+        
+        try:
+            with open(json_path, 'r') as f:
+                _label_Mapping = json.load(f)
+
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error reading the label file: {e}")
+            return None
+        
+        # 如果成功讀取，返回 Label_Mapping
+        return _label_Mapping
 
     #endregion
 
@@ -427,14 +514,17 @@ if __name__ == '__main__':
             select_model = input("Enter the 'name' of the model to load: ")
             Model.Load_model(select_model)
         elif(input_str == "3"):
-            mnistOrNotStr = input("Do you want to use the MNIST dataset for training? Enter 'n' to use your own images dataset (y/n): ")
-            
-            EmnistOrNotStr = input("Using EMNIST(y)/MNIST(n) dataset for training? 'y' for EMNIST, 'n' for MNIST: ")
+            print("which dataset do you want to use?")
+            user_input = input("1: custom, 2: mnist, 3: Emnist: (type 1~3) ")
 
-            if(mnistOrNotStr == "y"):
-                Model.Train_SelfDataset_or_not = False
-            else:
-                Model.Train_SelfDataset_or_not = True
+            options = {
+                "1": "custom",
+                "2": "mnist",
+                "3": "Emnist"
+            }
+
+            result = options.get(user_input, "null")
+            Model.target_dataset = result
 
             in_epoch = int(input("Enter the number of training epochs: "))
             Model.Train_Model(epochs=in_epoch)
