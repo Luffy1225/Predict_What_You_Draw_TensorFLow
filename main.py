@@ -133,7 +133,7 @@ class Predict_WhatUDraw_App:
         pred_label = self.Model.Predict(self.image)
 
         # text = f"{pred_label}"
-        text= self._label_to_str(pred_label)
+        text= self._labelmapping_to_str(pred_label)
 
         pred_label = text
         print(f"Prediction: {pred_label}")
@@ -195,14 +195,25 @@ class Predict_WhatUDraw_App:
         self.prevPoint = [0, 0]
 
 
-    def _label_to_str(self, label):
-        if 0 <= label <= 9:
-            return str(label)  # 0 到 9 直接轉換為字符串
-        elif 10 <= label <= 35:
-            # 將 10-35 轉換為 'A'-'Z'
-            return chr(label - 10 + ord('A'))
+    def _labelmapping_to_str(self, label):
+
+        str_label = int(label)
+        mapping = self.Model.Label_Mapping
+
+        if mapping != None:
+            for key, value in mapping.items(): # {"circle", 1}
+                if value == str_label: # 1 == 1
+                    return key  # return "circle"
         else:
-            raise ValueError("Label must be between 0 and 35")
+            raise ValueError("No Label Mapping Exist")
+
+        # if 0 <= label <= 9:
+        #     return str(label)  # 0 到 9 直接轉換為字符串
+        # elif 10 <= label <= 35:
+        #     # 將 10-35 轉換為 'A'-'Z'
+        #     return chr(label - 10 + ord('A'))
+        # else:
+        #     raise ValueError("Label must be between 0 and 35")
 
 
     def _generate_random_code(self, length=15):
@@ -235,13 +246,11 @@ class Predict_WhatUDraw_App:
     def _Model_combobox_on_combobox_select(self, event):
         # 獲取選擇的模型
         selected_model_name = self.Model_combobox.get()
-
-        # model_folder = "Models"
-        # selected_model_path = os.path.join(model_folder, selected_model_text)
-
         self.Model.SwitchModel(selected_model_name)
-
         print(f"Selected Model: {selected_model_name}")
+
+        self._clear_prediction()
+
 
     def _get_save_Path_list(self):
         folder = "images"
@@ -253,6 +262,9 @@ class Predict_WhatUDraw_App:
             save_Path_list.append(filename)
 
         return save_Path_list
+    
+    def _clear_prediction(self):
+        self.lb_Predict.config(text="Not started")
 
     #endregion
 

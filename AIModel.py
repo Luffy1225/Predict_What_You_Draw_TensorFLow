@@ -10,6 +10,7 @@ import json
 from PIL import Image
 import cv2
 from tensorflow.keras.datasets import mnist # type: ignore
+#from tensorflow.keras.datasets import emnist # type: ignore
 from tensorflow.keras.utils import to_categorical # type: ignore
 from tensorflow.keras.models import Sequential, load_model # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type: ignore
@@ -251,8 +252,11 @@ class AI_Model:
 
         if (self.target_dataset == "mnist"):
             (train_images, train_labels), (test_images, test_labels) = self._load_MNIST()
+            self._set_mnist_label_mapping()
+            
         elif (self.target_dataset == "Emnist"):
             (train_images, train_labels), (test_images, test_labels) = self._load_EMNIST()
+            self._set_Emnist_label_mapping()
         elif(self.target_dataset == "custom"): # Using your own Data_set
             (train_images, train_labels) = self._get_train_image_and_label()
             (test_images, test_labels) = self._get_test_image_and_label()
@@ -323,52 +327,6 @@ class AI_Model:
                         label_list.append(class_trainlabel)
 
             self.Label_Mapping[class_label] = class_trainlabel
-                    
-
-        print(f"{folder} has {len(image_list)} images")
-
-        if (len(image_list) == 0):
-            raise FileNotFoundError(f"Folder '{folder}' has no Valid image")
-
-
-        # 將圖像和標籤列表轉換為 NumPy 陣列
-        images = np.array(image_list)
-        labels = np.array(label_list)
-
-        return (images, labels)
-
-    def BACKUP_load_images_and_labels(self,folder): # get the images and labels 
-
-        # make sure the folder existed
-        if not os.path.exists(folder):
-            raise FileNotFoundError(f"Folder '{folder}' NOT FOUND")
-        
-        # new a list to keep those images and label
-        image_list = []
-        label_list = []
-
-        # 遍歷資料夾中的所有類別資料夾
-        
-        for class_label, class_name in enumerate(os.listdir(folder)):
-            class_folder = os.path.join(folder, class_name)
-            
-            if os.path.isdir(class_folder):  # 確保是資料夾
-                for filename in os.listdir(class_folder):
-                    if filename.endswith(".png") or filename.endswith(".jpg") or filename.endswith(".jpeg"):
-                        # 構建完整的圖像路徑
-                        image_path = os.path.join(class_folder, filename)
-                        
-                        # 使用 PIL 打開圖像並轉換為灰度圖像
-                        img = Image.open(image_path).convert('L')
-                        
-                        # 將圖像轉換為 NumPy 陣列
-                        img_array = np.array(img)
-                        
-                        # 將圖像陣列添加到列表中
-                        image_list.append(img_array)
-                        
-                        # 將標籤（類別索引）添加到標籤列表中
-                        label_list.append(class_label)
                     
 
         print(f"{folder} has {len(image_list)} images")
@@ -485,6 +443,22 @@ class AI_Model:
         
         # 如果成功讀取，返回 Label_Mapping
         return _label_Mapping
+
+
+    def _set_mnist_label_mapping(self):
+        mapping = {}
+        for i in range(10):
+            mapping[str(i)] = i
+        
+        self.Label_Mapping = mapping
+
+    def _set_Emnist_label_mapping(self):
+        mapping = {}
+        for i in range(10):
+            mapping[str(i)] = i
+        for i in range(10, 36):
+            mapping[chr(i + 55)] = i
+        self.Label_Mapping = mapping
 
     #endregion
 
