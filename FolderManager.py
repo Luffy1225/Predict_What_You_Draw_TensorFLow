@@ -22,7 +22,7 @@ class FolderManager:
         self.Valid_ext = valid_ext
 
 
-    def Count_File(self ,valid_ext=None, TargetCount = 216000):
+    def Count_File(self ,valid_ext=None, Targetperlabel = 5000):
         if valid_ext is None:
             valid_ext = self.Valid_ext
 
@@ -51,6 +51,8 @@ class FolderManager:
             subfolder_image_count = 0
             subfolder_size = 0
 
+            TargetCount = len(label_folders)*Targetperlabel
+            
             for label_folder in label_folders:
                 label_folder_path = os.path.join(subfolder_path, label_folder)
                 image_count, folder_size = self._count_files_in_folder(label_folder_path, valid_ext)

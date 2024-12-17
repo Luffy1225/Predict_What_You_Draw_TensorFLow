@@ -130,7 +130,7 @@ class AI_Model:
         print(f'Test set accuracy: {test_acc:.4f}')
 
         if self._train_flag:
-            self._visulizePerformance()
+            self._visualizePerformance()
         else:
             print("The model has not been trained, so the training process cannot be displayed.")
 
@@ -341,7 +341,7 @@ class AI_Model:
 
         return (images, labels)
 
-    def _visulizePerformance(self):  
+    def _visualizePerformance(self):  
         _ , (test_images, test_labels) = self._load_dataset()  # 預計接口
 
         # 視覺化訓練過程
@@ -361,13 +361,11 @@ class AI_Model:
 
             plt.figure(figsize=(12, 4))
 
-            _draw_epoch = []
-            for i in range(1,len(self.History.history['accuracy'])+1):
-                _draw_epoch.append(i)
+            epochs = list(range(1, len(self.history.history['accuracy']) + 1)) # start form 1
 
             plt.subplot(1, 2, 1)
-            plt.plot(_draw_epoch ,self.History.history['accuracy'], label='Training Accuracy')
-            plt.plot(_draw_epoch , self.History.history['val_accuracy'], label='Validation Accuracy')
+            plt.plot(epochs ,self.History.history['accuracy'], label='Training Accuracy')
+            plt.plot(epochs , self.History.history['val_accuracy'], label='Validation Accuracy')
             plt.xlabel('Epochs')
             plt.ylabel('Accuracy')
             plt.legend()
@@ -376,8 +374,8 @@ class AI_Model:
 
 
             plt.subplot(1, 2, 2)
-            plt.plot(_draw_epoch ,self.History.history['loss'], label='Training Loss')
-            plt.plot(_draw_epoch ,self.History.history['val_loss'], label='Validation Loss')
+            plt.plot(epochs ,self.History.history['loss'], label='Training Loss')
+            plt.plot(epochs ,self.History.history['val_loss'], label='Validation Loss')
             plt.xlabel('Epochs')
             plt.ylabel('Loss')
             plt.legend()

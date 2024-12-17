@@ -207,14 +207,6 @@ class Predict_WhatUDraw_App:
         else:
             raise ValueError("No Label Mapping Exist")
 
-        # if 0 <= label <= 9:
-        #     return str(label)  # 0 到 9 直接轉換為字符串
-        # elif 10 <= label <= 35:
-        #     # 將 10-35 轉換為 'A'-'Z'
-        #     return chr(label - 10 + ord('A'))
-        # else:
-        #     raise ValueError("Label must be between 0 and 35")
-
 
     def _generate_random_code(self, length=15):
         # 定義可用於隨機碼的字元集，包括數字和字母
