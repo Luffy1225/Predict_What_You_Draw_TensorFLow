@@ -361,7 +361,7 @@ class AI_Model:
 
             plt.figure(figsize=(12, 4))
 
-            epochs = list(range(1, len(self.history.history['accuracy']) + 1)) # start form 1
+            epochs = list(range(1, len(self.History.history['accuracy']) + 1)) # start form 1
 
             plt.subplot(1, 2, 1)
             plt.plot(epochs ,self.History.history['accuracy'], label='Training Accuracy')
