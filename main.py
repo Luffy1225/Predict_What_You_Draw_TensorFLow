@@ -242,6 +242,7 @@ class Predict_WhatUDraw_App:
         print(f"Selected Model: {selected_model_name}")
 
         self._clear_prediction()
+        self.Clear()
 
 
     def _get_save_Path_list(self):
