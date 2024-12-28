@@ -2,7 +2,6 @@ import os
 import string
 import shutil
 
-import tensorflow as tf
 from PIL import Image
 
 PICTURE_EXT_LIST = ['.jpg', '.png']
@@ -11,6 +10,7 @@ PYTHON_EXT_LIST = ['py']
 
 class FolderManager:
     Default_Imagefolder = "images"
+    Default_Subfolders = ["ignore", "train", "test"]
 
     def __init__(self, imagefolder = "", valid_ext = None):
 
@@ -112,29 +112,53 @@ class FolderManager:
             return "no EXT restriction"
 
     @classmethod
-    def Build_DataSet_Folders(cls):
+    def Build_DataSet_Folders(cls, type: str = "Empty"):
+        cls._build_Empty_Folders()
         base_folder = cls.Default_Imagefolder
-        subfolders = ["ignore", "train", "test"]
 
-        # 數字和字母資料夾名稱
-        digits = [str(i) for i in range(10)]
-        letters = list(string.ascii_uppercase)
+        if type == "MNIST":
+            cls._build_Specific_Folders([str(i) for i in range(10)])
+        elif type == "EMNIST":
+            cls._build_Specific_Folders([str(i) for i in range(10)] + list(string.ascii_uppercase))
+        elif type == "Shape":
+            cls._build_Specific_Folders(["circle", "square", "triangle", "none", "diamond"])
+        elif type == "By_List":
+            labels = input("Please enter the labels you want to create, separated by commas: ").split(",")
+            cls._build_Specific_Folders(labels)
 
-        # 創建主資料夾
+        print(f"Type[{type}] : '{base_folder}' has been created.")
+
+    @classmethod
+    def _build_Empty_Folders(cls):
+        base_folder = cls.Default_Imagefolder
+        subfolders = cls.Default_Subfolders
+
+        # Create main folder
         os.makedirs(base_folder, exist_ok=True)
 
-        # 在每個子資料夾中創建數字和字母資料夾
+        # Create subfolders
+        for subfolder in subfolders:
+            subfolder_path = os.path.join(base_folder, subfolder)
+            os.makedirs(subfolder_path, exist_ok=True)
+        print(f"Empty image structure: '{base_folder}' has been created.")
+
+    @classmethod
+    def _build_Specific_Folders(cls, labels):
+        base_folder = cls.Default_Imagefolder
+        subfolders = cls.Default_Subfolders
+
+        # Create subfolders with specific labels
         for subfolder in subfolders:
             subfolder_path = os.path.join(base_folder, subfolder)
             os.makedirs(subfolder_path, exist_ok=True)
             
-            for digit in digits:
-                os.makedirs(os.path.join(subfolder_path, digit), exist_ok=True)
-            
-            for letter in letters:
-                os.makedirs(os.path.join(subfolder_path, letter), exist_ok=True)
+            for label in labels:
+                os.makedirs(os.path.join(subfolder_path, label), exist_ok=True)
 
-        print(f"Folder :'{base_folder}' has been created.")
+        print(f"Specific folders: '{base_folder}' with labels {labels} have been created.")
+
+
+
 
     @staticmethod
     def Import_image_to_image(frompath, to_path):  # HASN't TEST YET
@@ -191,6 +215,8 @@ class FolderManager:
     @staticmethod
     def Download_MNIST_DataSet(num_per_label=2000, output_dir="./mnist_images"):
         # download MNIST dataset
+        
+        import tensorflow as tf
         (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
 
         # 建立基礎資料夾結構
@@ -262,8 +288,24 @@ if __name__ == "__main__":
         
         elif choice == '1':
             # Build the DataSet Folder
-            FolderManager.Build_DataSet_Folders()
-            print("The folder structure has been created.")
+            print("Which kind of folder structure would you want to Build?")
+            print("1. Empty structure")
+            print("2. MNIST structure")
+            print("3. EMNIST structure")
+            print("4. Shape structure")
+            print("5. Shape structure")
+            user_input = input("Enter your choice: ")
+            
+            options = {
+                "1": "Empty",
+                "2": "MNIST",
+                "3": "EMNIST",
+                "4": "Shape",
+                "5": "By_List"
+            }
+
+            result = options.get(user_input, "Empty")
+            FolderManager.Build_DataSet_Folders(result)
         
         elif choice == '2':
             # Count Image

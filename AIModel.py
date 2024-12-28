@@ -14,6 +14,7 @@ from tensorflow.keras.datasets import mnist # type: ignore
 from tensorflow.keras.utils import to_categorical # type: ignore
 from tensorflow.keras.models import Sequential, load_model # type: ignore
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense # type: ignore
+import shutil
 
 #endregion
 
@@ -22,7 +23,11 @@ class AI_Model:
 
     def __init__(self, _model_name = ""):
 
-        self.default_model_name = self.Get_Models_List()[0]
+        models_list = self.Get_Models_List()
+        if models_list:
+            self.default_model_name = models_list[0]
+        else:
+            raise ValueError("No models found in the models directory.")
         self.target_dataset = "custom" # using my own dataset as Default
 
         if(_model_name == ""): # If the model name is not specified, use the first entry in the model folder.
@@ -153,7 +158,6 @@ class AI_Model:
         print(f"Test has {test_label_amount} labels")
 
 
-
         # Model
         model = Sequential([
             Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
@@ -210,7 +214,7 @@ class AI_Model:
             self._save_label_file(label_full_name)
             print(f"Save Label File to: {label_full_name}")
 
-
+            self._move_tempplot_to_modelfolder()
         else:
             print("Model is None.")
 
@@ -359,30 +363,53 @@ class AI_Model:
             matplotlib.font_manager.fontManager.addfont(font_path)
             matplotlib.rc('font', family='Taipei Sans TC Beta')
 
-            plt.figure(figsize=(12, 4))
+            plt.figure(figsize=(12, 5))
 
             epochs = list(range(1, len(self.History.history['accuracy']) + 1)) # start form 1
 
             plt.subplot(1, 2, 1)
-            plt.plot(epochs ,self.History.history['accuracy'], label='Training Accuracy')
-            plt.plot(epochs , self.History.history['val_accuracy'], label='Validation Accuracy')
+            
+            if(len(epochs) == 1): # if only one epoch show "dot"
+                plt.plot(epochs ,self.History.history['accuracy'], 'bo', label='Training Accuracy')
+                plt.plot(epochs , self.History.history['val_accuracy'], 'ro', label='Validation Accuracy')
+            else: # show "line"
+                plt.plot(epochs ,self.History.history['accuracy'], label='Training Accuracy')
+                plt.plot(epochs , self.History.history['val_accuracy'], label='Validation Accuracy')
+
+            best_epoch, best_epoch_val = self._find_best_epoch_byAccuracy(epochs , self.History.history['val_accuracy'])
+            plt.title(f'Best Epoch would be: {best_epoch}  Accuracy: {best_epoch_val:.4f}')
+
             plt.xlabel('Epochs')
             plt.ylabel('Accuracy')
             plt.legend()
             plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))  # 設置 x 軸顯示整數刻度
 
-
-
             plt.subplot(1, 2, 2)
-            plt.plot(epochs ,self.History.history['loss'], label='Training Loss')
-            plt.plot(epochs ,self.History.history['val_loss'], label='Validation Loss')
+            
+            if(len(epochs) == 1): # if only one epoch show "dot"
+                plt.plot(epochs ,self.History.history['loss'], 'bo', label='Training Loss')
+                plt.plot(epochs ,self.History.history['val_loss'], 'ro' ,label='Validation Loss')
+            else: # show "line"
+                plt.plot(epochs ,self.History.history['loss'], label='Training Loss')
+                plt.plot(epochs ,self.History.history['val_loss'],label='Validation Loss')
+          
+            best_epoch, best_epoch_val  = self._find_best_epoch_byLoss(epochs , self.History.history['val_loss'])
+            plt.title(f'Best Epoch would be: {best_epoch}  Loss: {best_epoch_val:.4f}')
+
             plt.xlabel('Epochs')
             plt.ylabel('Loss')
             plt.legend()
             plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))  # 設置 x 軸顯示整數刻度
 
+            # 主標題
+            plt.suptitle(f"Total Epoch: {self._Epochs}", fontsize=16)
 
+            plt.tight_layout(rect=[0, 0, 1, 0.97])  # 調整布局防止主標題與子圖重疊
+
+            self._save_plot_totemp()
             plt.show()
+
+
 
         else:
             print("History is NONE, Please Train the Model")
@@ -458,6 +485,45 @@ class AI_Model:
             mapping[chr(i + 55)] = i
         self.Label_Mapping = mapping
 
+    def _find_best_epoch_byAccuracy(self, epochs, history_val):
+        best_epoch_val = max(history_val)
+        best_epoch = history_val.index(best_epoch_val)
+        epochs = epochs[best_epoch]
+        return best_epoch + 1, best_epoch_val
+
+    def _find_best_epoch_byLoss(self, epochs, history_val):
+        best_epoch_val = min(history_val)
+        best_epoch = history_val.index(best_epoch_val)
+        epochs = epochs[best_epoch]
+        return best_epoch + 1, best_epoch_val
+    
+    def _move_tempplot_to_modelfolder(self): # save the evaluation plot to the file
+        source_path = os.path.join("temp", "evaluation_plot.png")
+        dis_path = os.path.join("models", self.Model_Name, "evaluation_plot.png")
+
+            # 確認源檔案是否存在
+        if os.path.exists(source_path):
+            # 確認目標資料夾是否存在，不存在則創建
+            model_folder = os.path.dirname(dis_path)
+            if not os.path.exists(model_folder):
+                os.makedirs(model_folder)
+
+            # 移動檔案，使用 shutil.move() 更加安全且處理目錄情況
+            shutil.move(source_path, dis_path)
+            print(f"File moved to {dis_path}")
+
+            # remove the temp folder
+            shutil.rmtree("temp")
+        else:
+            print("Can't find the evaluation_plot.png")
+        
+
+    def _save_plot_totemp(self): # save the evaluation plot to the temp folder
+        os.makedirs("temp", exist_ok=True)
+        os.makedirs(os.path.join("temp"), exist_ok=True)
+        save_path = os.path.join("temp", "evaluation_plot.png")
+        plt.savefig(save_path)
+
     #endregion
 
 
@@ -485,6 +551,8 @@ if __name__ == '__main__':
             print("\n\nA new model has been created.\n\n")
         elif(input_str == "2"):
             Model.Print_Model_List()
+
+            
             select_model = input("Enter the 'name' of the model to load: ")
             Model.Load_model(select_model)
         elif(input_str == "3"):

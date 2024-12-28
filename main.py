@@ -16,7 +16,7 @@ class Predict_WhatUDraw_App:
         self.root = root
         self.root.title("Predict What You Draw")
         
-        self.canvas_size = 280  # 放大顯示區域的尺寸
+        self.canvas_size = 280  # Size of the enlarged display area
         self.image_size = 28
         
         self.QuickSave = True
@@ -26,12 +26,12 @@ class Predict_WhatUDraw_App:
         self.currentPoint = [0,0]
 
         
-        # 初始化畫布
+        # Initialize canvas
         self.canvas = tk.Canvas(self.root, width=self.canvas_size, height=self.canvas_size, bg='black')
-        self.canvas.grid(row=0, column=0, columnspan=4)  # 將畫布放在第一行，橫跨4列
+        self.canvas.grid(row=0, column=0, columnspan=4)  # Place the canvas in the first row, spanning 4 columns
         
 
-        # 動作 Binding
+        # Action Binding
         self.canvas.bind("<B1-Motion>", self._paint)
         self.canvas.bind("<ButtonRelease-1>", self._paint_reset)
 
@@ -44,7 +44,7 @@ class Predict_WhatUDraw_App:
         self.canvas_image = tk.PhotoImage(width=self.canvas_size, height=self.canvas_size)
         self.canvas.create_image((self.canvas_size//2, self.canvas_size//2), image=self.canvas_image, anchor=tk.CENTER)
         
-        # 模型選擇下拉框
+        # Model selection dropdown
         models_list = self._get_Models_list()
         self.Model_combobox = ttk.Combobox(root, values=models_list,font=("Helvetica", 16))
         self.Model_combobox.config(width=30)
@@ -52,15 +52,15 @@ class Predict_WhatUDraw_App:
         self.Model_combobox.bind("<<ComboboxSelected>>", self._Model_combobox_on_combobox_select)
         self.Model_combobox.current(0)
 
-        # 開始預測按鈕
-        self.Predict_button = tk.Button(self.root, text="Start Prediction", command=self.Predict,font=("Helvetica", 16))
+        # Start Prediction Button
+        self.Predict_button = tk.Button(self.root, text="Start Prediction", command=self.Predict, font=("Helvetica", 16))
         self.Predict_button.grid(row=2, column=0, padx=10)
 
-        # 清除畫板按鈕
-        self.Clear_button = tk.Button(self.root, text="Clear Canvas", command=self.Clear,font=("Helvetica", 16))
+        # Clear Canvas button
+        self.Clear_button = tk.Button(self.root, text="Clear Canvas", command=self.Clear, font=("Helvetica", 16))
         self.Clear_button.grid(row=2, column=1, padx=10)
 
-        # 預測結果無用標籤
+        # Prediction result unused label
         self.lb_label1 = tk.Label(root, text="Prediction: ", font=("Helvetica", 16))
         self.lb_label1.grid(row=3, column=0, columnspan=4, padx=30,pady=10, sticky='w')
 
@@ -165,8 +165,6 @@ class Predict_WhatUDraw_App:
         x = event.x
         y = event.y
         self.currentPoint = [x // (self.canvas_size // self.image_size), y // (self.canvas_size // self.image_size)]
-
-
 
         if self.prevPoint != [0, 0]:
             # 繪製到tkinter畫布上
