@@ -1,6 +1,6 @@
 ﻿# Predict_What_You_Draw
 
-- [中文版 說明](/readme/zh_TW/README_zh_TW.md)
+- [中文版 說明](/README_zh_TW.md)
 
 
 This is a hand-drawn image recognition application based on the Tkinter and PIL libraries. Users can draw digits or letters within the application and make predictions using a pre-trained MNIST model or a custom-trained model.
@@ -63,7 +63,7 @@ python FolderManager.py
 
 ## How to Train Your Own Model?
 
-- [tutorial](readme/EN/tutorial_EN.md)
+- [tutorial](tutorial_EN.md)
 
 
 

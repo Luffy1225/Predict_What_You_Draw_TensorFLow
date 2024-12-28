@@ -1,4 +1,4 @@
-- [返回說明](/readme/zh_TW/README_zh_TW.md)
+- [返回說明](README_zh_TW.md)
 
 # 怎麼訓練自己的模型？
 
