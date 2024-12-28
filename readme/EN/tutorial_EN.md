@@ -1,4 +1,4 @@
-- [back to Instruction](/readme.md)
+- [back to Instruction](../EN/README.md)
 
 # How to Train Your Own Model?
 
