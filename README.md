@@ -63,7 +63,7 @@ python FolderManager.py
 
 ## How to Train Your Own Model?
 
-- [tutorial](readme/zh_TW/tutorial_zh_TW.md)
+- [tutorial](readme/EN/tutorial_EN.md)
 
 
 
