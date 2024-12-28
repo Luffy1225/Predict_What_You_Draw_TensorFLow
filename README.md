@@ -8,7 +8,7 @@ This is a hand-drawn image recognition application based on the Tkinter and PIL 
 # Install 
 
 ```
-git clone https://github.com/Luffy1225/Mnist_Machine_Learning_Practice.git
+git clone https://github.com/Luffy1225/Predict_What_You_Draw_TensorFLow.git
 cd Predict_What_You_Draw_TensorFLow
 pip install -r requirements.txt
 ```
@@ -26,15 +26,17 @@ pip install -r requirements.txt
 python main.py
 ```
 
+## Start AI Training
+```
+python AIModel.py
+```
+
 ## Start FolderManager
 ```
 python FolderManager.py
 ```
 
-## Start AI Training
-```
-python AIModel.py
-```
+
 
 ## Feature of Predict What You Draw 
 
@@ -53,8 +55,16 @@ python AIModel.py
 4. Clear Canvas:
     Users can clear all content on the canvas to redraw digits.
 
-5. Save Image:
-    Drawn images can be saved locally as part of the training set.
+5. Save Image (Right click):
+    Drawn images can be saved as part of the training set.
+    You can also using this feature for making your own dataset.
+
+
+
+## How to Train Your Own Model?
+
+- [tutorial](readme/zh_TW/tutorial_zh_TW.md)
+
 
 
 ## Structure of `images` Folder
